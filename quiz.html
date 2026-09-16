@@ -43,7 +43,7 @@
 </div>
 <div id="quizList" style="margin-top:12px"></div>
 <div class="toolbar"><button class="btn primary" id="submitBtn" style="font-size:16px;padding:10px 26px">📊 交卷判分</button>
-<a href="modules.html"><button class="btn">回看知识点</button></a></div>
+<a class="btn" href="modules.html">回看知识点</a></div>
 <div class="card" id="resultCard" style="display:none"></div>
 </main>
 </div>
@@ -128,14 +128,28 @@ const BANK=[
 {t:"judge",c:"geo",q:"凌汛发生在由高纬流向低纬的结冰河流。",o:["正确","错误"],a:1,e:"低纬向高纬才易壅冰。"},
 {t:"judge",c:"geo",q:"二十届五中全会定于2026年10月召开。",o:["正确","错误"],a:0,e:"7.30政治局会议决定。"},
 {t:"judge",c:"geo",q:"中美新定位为建设性战略稳定关系。",o:["正确","错误"],a:0,e:"2026.5会晤确立。"},
-{t:"judge",c:"geo",q:"普通支票只能转账不能取现。",o:["正确","错误"],a:1,e:"普通支票两者皆可。"}
+{t:"judge",c:"geo",q:"普通支票只能转账不能取现。",o:["正确","错误"],a:1,e:"普通支票两者皆可。"},
+{t:"single",c:"geo",q:"2025年诺贝尔和平奖得主是？",o:["马查多","克拉斯纳霍尔凯","北川进","莫基尔"],a:0,e:"委内瑞拉反对派领袖，表彰民主权利努力。"},
+{t:"single",c:"geo",q:"2025年诺贝尔化学奖表彰的领域是？",o:["量子计算","金属有机骨架化合物","免疫耐受","创新增长理论"],a:1,e:"北川进/罗布森/亚吉。"},
+{t:"single",c:"geo",q:"“共和国勋章”上次集中颁授与下批预计是？",o:["2019七十周年/2029八十周年","2009/2019","2015/2025","2024/2034"],a:0,e:"逢五逢十国庆颁授。"},
+{t:"single",c:"geo",q:"我国T1200级超高强度碳纤维的意义是？",o:["依赖进口","世界首个该级别百吨量产","实验室样品","已停产"],a:1,e:"自主研发全球首发。"},
+{t:"single",c:"geo",q:"“深地塔科1井”的纪录是？",o:["10910米陆上万米首次油气显示","11200米亚洲第一","1500米深海","537天腐蚀"],a:0,e:"11200米的是信科一井。"},
+{t:"single",c:"geo",q:"“领航号”高铁盾构机的开挖直径是？",o:["10.4米","12.8米","15.4米","18.2米"],a:2,e:"世界最大直径，约5层楼高。"},
+{t:"single",c:"geo",q:"神舟二十一号乘组在轨驻留时长？",o:["120天","180天","210天创世界纪录","365天"],a:2,e:"张陆/武飞/张洪章5.29返回。"},
+{t:"single",c:"geo",q:"7.10长征十号乙任务的突破是？",o:["月球采样","海上网系回收全球首次","空间站对接","一箭7星"],a:1,e:"领航者船网系捕获垂直回收。"},
+{t:"single",c:"new",q:"公积金条例修订后施行日期是？",o:["2026.8.18","2026.9.20","2026.1.1","2027.1.1"],a:1,e:"8.18发布，第三次大修共20条。"},
+{t:"single",c:"new",q:"数字人民币业务运营机构总数扩容至？",o:["12家","22家","30家","40家"],a:2,e:"12家股份行全在列，中西部城商首次纳入。"},
+{t:"single",c:"new",q:"第十一届APEC粮食安全部长级会议举办地是？",o:["北京","上海","杭州","广州"],a:2,e:"8.25通过联合声明+创新数字化原则文件。"},
+{t:"single",c:"law",q:"定金数额不得超过主合同标的额的？",o:["10%","20%","30%","50%"],a:1,e:"超限部分无效；定金违约金二选一。"},
+{t:"judge",c:"law",q:"劳动争议未经仲裁可直接向法院起诉。",o:["正确","错误"],a:1,e:"仲裁前置，未经仲裁法院不受理。"},
+{t:"single",c:"fin",q:"2026年9月国家向中央金融企业注资？",o:["5000亿4家","3600亿8家","3000亿6家","8000亿10家"],a:1,e:"补充核心一级资本；5000亿注四大行是2025年。"}
 ];
 </script>
 <script>
 (function(){
   let f='all', tp='all';
   const u=new URLSearchParams(location.search);
-  if(u.get('type')){const m={law:'law',fin:'fin'}; if(m[u.get('type')]) f=m[u.get('type')];}
+  if(u.get('type')){const m={law:'law',fin:'fin',geo:'geo',new:'new'}; if(m[u.get('type')]) f=m[u.get('type')];}
   const list=document.getElementById('quizList');
   const scoreChip=document.getElementById('scoreChip'), countChip=document.getElementById('countChip');
   const store=JSON.parse(localStorage.getItem('affairs-answers')||'{}');

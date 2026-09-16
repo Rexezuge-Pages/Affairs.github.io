@@ -1,11 +1,11 @@
 // 通用交互：主题 / 导航 / 搜索 / 进度 / 回顶
 (function(){
   const root=document.documentElement;
-  const savedTheme=localStorage.getItem('affairs-theme');
-  if(savedTheme) root.setAttribute('data-theme',savedTheme);
+  const savedTheme=localStorage.getItem('affairs-theme')||'light';
+  root.setAttribute('data-theme',savedTheme);
   function toggleTheme(){
     const cur=root.getAttribute('data-theme')==='dark'?'light':'dark';
-    if(cur==='light') root.removeAttribute('data-theme'); else root.setAttribute('data-theme','dark');
+    root.setAttribute('data-theme',cur);
     localStorage.setItem('affairs-theme',cur);
     const b=document.getElementById('themeBtn'); if(b) b.textContent=(cur==='dark'?'☀️ 浅色':'🌙 深色');
   }
