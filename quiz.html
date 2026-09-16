@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>刷题中心 · 时政学习站</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+<a class="brand" href="index.html"><span class="brand-mark">政</span><span>时政学习站</span></a>
+<nav class="nav"><a href="index.html">首页</a><a href="modules.html">8大模块</a><a href="timeline.html">时间轴</a><a href="flashcards.html">速记卡</a><a href="quiz.html">刷题</a></nav>
+<div class="spacer"></div>
+<button class="btn ghost" id="menuBtn">☰</button>
+<button class="btn" id="themeBtn" onclick="toggleTheme()">🌙 深色</button>
+</div></header>
+<div class="layout">
+<aside class="side">
+<h3>题库筛选</h3>
+<a href="#" data-f="all">📚 全部（90题）</a>
+<a href="#" data-f="fin">🏦 金融时政</a>
+<a href="#" data-f="law">⚖️ 法律</a>
+<a href="#" data-f="new">🆕 求是+十五五新增</a>
+<a href="#" data-f="geo">🌍 地理黄河+科技</a>
+<a href="#" data-f="wrong">❌ 错题本 (<span id="wrongCount">0</span>)</a>
+<h3>题型</h3>
+<a href="#" data-t="all">全部题型</a>
+<a href="#" data-t="single">单选</a>
+<a href="#" data-t="multi">多选</a>
+<a href="#" data-t="judge">判断</a>
+</aside>
+<main class="main">
+<div class="card">
+<h2>📝 刷题中心 <span class="muted" style="font-size:13px">源自时政.txt题库全量精选+9.16求是新增</span></h2>
+<div class="toolbar">
+<button class="btn primary" id="shuffleBtn">🔀 随机排序</button>
+<button class="btn" id="showAllBtn">👁 一键显示解析</button>
+<button class="btn" id="resetBtn">↺ 清空作答+错题</button>
+<span class="chip" id="scoreChip">得分：未交卷</span>
+<span class="chip" id="countChip"></span>
+</div>
+<div class="searchbox" style="max-width:420px">🔍<input id="q" placeholder="题内搜索：如 再贷款 / 桃花峪 / 定金…"></div>
+<div class="muted" id="searchCount" style="font-size:13px"></div>
+</div>
+<div id="quizList" style="margin-top:12px"></div>
+<div class="toolbar"><button class="btn primary" id="submitBtn" style="font-size:16px;padding:10px 26px">📊 交卷判分</button>
+<a href="modules.html"><button class="btn">回看知识点</button></a></div>
+<div class="card" id="resultCard" style="display:none"></div>
+</main>
+</div>
+<button class="btn primary" id="toTop">↑ 回顶</button>
+<footer class="foot">多选少选错选不得分 · 作答自动保存本地 · 错题自动进错题本</footer>
+<script src="assets/js/app.js"></script>
+<script>
+// 题库：t=single/multi/judge, c=fin/law/new/geo, a=答案索引(单选数字/多选数组/判断0对1错)
+const BANK=[
+{t:"single",c:"new",q:"《求是》第18期习近平《在加强基础研究座谈会上的讲话》中，基础研究的三大定位是？",o:["源头、总机关、前沿阵地","动力、源泉、保障","基础、支柱、引领","理论、实践、创新"],a:0,e:"原文：整个科学体系的源头、所有技术问题的总机关、全球科技竞争的前沿阵地。"},
+{t:"single",c:"new",q:"衡量一个国家科技实力的重要标准是？",o:["GDP总量","基础研究水平","人口规模","外汇储备"],a:1,e:"原文：重要标准就是看基础研究水平。"},
+{t:"multi",c:"new",q:"党的十八大以来加强基础研究的三举措包括？",o:["优化科研布局","加大投入保障","创新体制机制","减少科研投入"],a:[0,1,2],e:"三举措对应原文，D相反。"},
+{t:"single",c:"new",q:"二十届四中全会审议通过的核心文件是？",o:["十四五规划纲要","十五五规划《建议》","金融法草案","黄河保护法"],a:1,e:"2025.10.20-23通过十五五规划建议，金融强国首次写入。"},
+{t:"single",c:"new",q:"“十五五”时期的战略定位是？",o:["全面收官","夯实基础、全面发力关键时期","高速增长期","计划收缩期"],a:1,e:"为2035基本实现现代化奠定更坚实基础。"},
+{t:"single",c:"fin",q:"金融工作的根本属性是？",o:["盈利性安全性","政治性人民性","流动性效益性","创新性开放性"],a:1,e:"中央金融工作会议明确。"},
+{t:"single",c:"fin",q:"金融“五篇大文章”不包含？",o:["科技金融","绿色金融","普惠金融","虚拟金融"],a:3,e:"科技绿普养数，虚拟金融为干扰项。"},
+{t:"single",c:"fin",q:"金融强国六大要素不包括？",o:["强大的货币","强大的金融机构","强大的金融市场","强大的互联网平台"],a:3,e:"六要素：货币机构市场基建监管人才。"},
+{t:"single",c:"fin",q:"中国特色金融文化说法错误的是？",o:["诚实守信不逾越底线","以义取利不唯利是图","稳健审慎不急功近利","追求短期高收益脱实向虚"],a:3,e:"反对脱实向虚唯利是图。"},
+{t:"single",c:"fin",q:"我国宏观调控双支柱框架是？",o:["财政单支柱","货币政策+宏观审慎","产业单支柱","利率单支柱"],a:1,e:"现代中央银行制度核心。"},
+{t:"single",c:"fin",q:"2025—2026货币政策总基调？",o:["适度从紧","适度宽松","稳健偏紧","紧缩"],a:1,e:"加大逆周期跨周期调节。"},
+{t:"single",c:"fin",q:"《金融强国建设“十五五”规划》目标2035年？",o:["2025建成","2030建成","基本建成中国特色现代金融体系","2050建成"],a:2,e:"2035基本建成。"},
+{t:"single",c:"fin",q:"不属于重点风险防范的是？",o:["中小金融机构","房地产金融风险","地方融资平台","个人正常消费信贷"],a:3,e:"前三项+非法金融为重点。"},
+{t:"single",c:"fin",q:"金融监管根本底线？",o:["利润最大化","守住不发生系统性金融风险","扩大信贷","提高营收"],a:1,e:"重要底线要求。"},
+{t:"single",c:"fin",q:"2026小微金融总要求？",o:["稳投放优结构提质量可持续","只求规模","只服务大企业","只做高收益"],a:0,e:"金监总局通知原文。"},
+{t:"single",c:"fin",q:"《金融法（草案）》首要坚持？",o:["利润优先","党中央集中统一领导","资本优先","开放优先"],a:1,e:"第一部管总基础法律。"},
+{t:"single",c:"fin",q:"属于结构性货币政策工具的是？",o:["存款准备金率","支农支小再贷款","逆回购","MLF"],a:1,e:"定向支持重点薄弱。"},
+{t:"single",c:"fin",q:"金融工作主线？",o:["防风险强监管促高质量","扩规模","提收益","跨境优先"],a:0,e:"全国金融系统工作会议。"},
+{t:"single",c:"fin",q:"普惠金融正确说法？",o:["只服务大企业","服务小微三农弱势群体","只做高风险","不顾风险"],a:1,e:"提升可得性兼顾风险。"},
+{t:"single",c:"fin",q:"金融根本宗旨？",o:["服务实体经济","服务虚拟经济","追求盈利","投机"],a:0,e:"回归本源防脱实向虚。"},
+{t:"single",c:"fin",q:"2026陆家嘴论坛离岸人民币试点在？",o:["上海自贸区","深圳前海","海南自贸港","北京"],a:0,e:"服务上海国际金融中心。"},
+{t:"single",c:"fin",q:"不属于高水平开放的是？",o:["人民币国际化","债券通互换通","熊猫债","禁止境外机构参与"],a:3,e:"稳步双向开放。"},
+{t:"single",c:"fin",q:"金融机构治理目标到哪年形成规范高效机制？",o:["2026","2029","2035","2050"],a:1,e:"9部分22条意见。"},
+{t:"single",c:"fin",q:"2025年科技创新和技术改造再贷款总额达？",o:["3000亿","5000亿","8000亿","1万亿"],a:2,e:"增加3000亿后达8000亿，两新政策。"},
+{t:"multi",c:"fin",q:"金融“五篇大文章”包括？",o:["科技","绿色","普惠","养老","数字"],a:[0,1,2,3,4],e:"五篇全选。"},
+{t:"multi",c:"fin",q:"金融文化内涵包括？",o:["诚实守信","以义取利","稳健审慎","守正创新","依法合规"],a:[0,1,2,3,4],e:"15字全选。"},
+{t:"multi",c:"fin",q:"金融强国六要素？",o:["货币","机构","市场","基建","监管","人才"],a:[0,1,2,3,4,5],e:"六大全选。"},
+{t:"multi",c:"fin",q:"重点防化风险领域？",o:["中小机构","房地产","融资平台","非法金融"],a:[0,1,2,3],e:"四项全选。"},
+{t:"multi",c:"fin",q:"结构性工具包括？",o:["支农支小再贷款","科创再贷款","民营再贷款","碳减排工具"],a:[0,1,2,3],e:"定向工具全选。"},
+{t:"multi",c:"fin",q:"2026重点结构性举措包括？",o:["1万亿民营再贷款","降再贷款利率0.25pp","8000亿新型政策性工具","1000亿协同专项"],a:[0,1,2,3],e:"四项均为2026政策。"},
+{t:"judge",c:"fin",q:"金融工作要把握政治性人民性，服务实体经济。",o:["正确","错误"],a:0,e:"总纲表述。"},
+{t:"judge",c:"fin",q:"2025—2026货币政策基调为适度从紧。",o:["正确","错误"],a:1,e:"应为适度宽松。"},
+{t:"judge",c:"fin",q:"双支柱指财政政策+产业政策。",o:["正确","错误"],a:1,e:"货币+宏观审慎。"},
+{t:"judge",c:"fin",q:"普惠金融只服务大型企业。",o:["正确","错误"],a:1,e:"重点小微三农薄弱群体。"},
+{t:"judge",c:"fin",q:"数字金融可无限制收集客户信息。",o:["正确","错误"],a:1,e:"合法正当必要最小必要。"},
+{t:"single",c:"law",q:"设立商业银行应当经谁批准？",o:["国务院","金监总局","人民银行","财政部"],a:1,e:"央行管货币，金监管准入。"},
+{t:"single",c:"law",q:"属于民法典担保方式的是？",o:["违约金","定金","罚款","罚金"],a:1,e:"保证抵押质押留置定金。"},
+{t:"single",c:"law",q:"票据基本当事人不包括？",o:["出票人","付款人","收款人","保证人"],a:3,e:"保证人是非基本当事人。"},
+{t:"single",c:"law",q:"劳动合同试用期最长？",o:["3个月","6个月","1年","2年"],a:1,e:"3年+/无固定最长6个月。"},
+{t:"single",c:"law",q:"不得向关系人发放？",o:["信用贷款","担保贷款","抵押贷款","质押贷款"],a:0,e:"担保贷不优于他人。"},
+{t:"single",c:"law",q:"普通诉讼时效？",o:["1年","3年","5年","20年"],a:1,e:"最长保护20年。"},
+{t:"single",c:"law",q:"不属于法人的是？",o:["有限责任公司","事业单位","合伙企业","商业银行"],a:2,e:"合伙企业非法人组织。"},
+{t:"single",c:"law",q:"个人信息处理核心原则？",o:["随便收集","合法正当必要","永久保存","随意共享"],a:1,e:"个信法最小必要。"},
+{t:"single",c:"law",q:"资信良好确能偿还可？",o:["不提供担保","必须抵押","必须保证","只能担保贷"],a:0,e:"银行自主评估信用贷。"},
+{t:"single",c:"law",q:"持票人对支票出票人权利自出票日起多久消灭？",o:["6个月","1年","2年","3个月"],a:0,e:"汇票本票2年，支票6个月。"},
+{t:"single",c:"law",q:"法定代表人职务行为后果由谁承担？",o:["个人","法人","股东","董事会"],a:1,e:"职务行为归法人。"},
+{t:"single",c:"law",q:"银行信用危机监管可采取？",o:["接管","冻股东产","注销","代偿"],a:0,e:"接管不改债权债务。"},
+{t:"single",c:"law",q:"属于无效合同的是？",o:["重大误解","恶意串通损他人","欺诈","显失公平"],a:1,e:"后三者可撤销。"},
+{t:"single",c:"law",q:"破产优先支付个人储蓄前的是？（接上题顺序）银行破产清算付完清算费工资后优先？",o:["税款","个人储蓄本息","企业债权","股东分配"],a:1,e:"清算→工资→储蓄→税→普债。"},
+{t:"single",c:"law",q:"接管期限最长？",o:["1年","2年","3年","5年"],a:1,e:"最长2年。"},
+{t:"single",c:"law",q:"不属于票据的是？",o:["汇票","本票","支票","借条"],a:3,e:"借条是普通债权凭证。"},
+{t:"single",c:"law",q:"3个月～不满1年试用期≤？",o:["无试用期","1个月","2个月","6个月"],a:1,e:"3月内不得约定试用期。"},
+{t:"multi",c:"law",q:"商业银行可经营？",o:["吸存","放贷","结算","承销政府债券"],a:[0,1,2,3],e:"禁证券信托无许可。"},
+{t:"multi",c:"law",q:"可撤销民事法律行为？",o:["重大误解","欺诈","胁迫","显失公平"],a:[0,1,2,3],e:"四项全可撤销。"},
+{t:"multi",c:"law",q:"洗钱上游犯罪？",o:["毒品","走私","贪贿","金融诈骗"],a:[0,1,2,3],e:"还含黑恐等。"},
+{t:"multi",c:"law",q:"不得解除劳动合同情形？",o:["孕产哺","医疗期","15年+5年退休","严重违纪"],a:[0,1,2],e:"D可单方解除。"},
+{t:"multi",c:"law",q:"反洗钱三核心制度？",o:["身份识别","大额可疑报告","资料保存","家访调查"],a:[0,1,2],e:"三大义务。"},
+{t:"multi",c:"law",q:"保证人代偿后说法正确？",o:["可要求债务人还","可要求保证人担责","代偿后可追偿","代偿后不可追偿"],a:[0,1,2],e:"保证人有追偿权。"},
+{t:"judge",c:"law",q:"商业银行可自行决定停业解散。",o:["正确","错误"],a:1,e:"须金监总局批准。"},
+{t:"judge",c:"law",q:"票据一经背书转让权利随之转让。",o:["正确","错误"],a:0,e:"票据无因性背书连续。"},
+{t:"judge",c:"law",q:"建立劳动关系可不签书面合同。",o:["正确","错误"],a:1,e:"须签，超1月2倍，满1年无固定。"},
+{t:"judge",c:"law",q:"存款自愿取款自由存款有息为存款人保密是储蓄原则。",o:["正确","错误"],a:0,e:"四原则。"},
+{t:"judge",c:"law",q:"接管期限最长3年。",o:["正确","错误"],a:1,e:"最长2年。"},
+{t:"judge",c:"law",q:"恶意串通损他人属无效行为。",o:["正确","错误"],a:0,e:"违反强制公序亦无效。"},
+{t:"single",c:"geo",q:"黄河上中游分界是？",o:["河口","桃花峪","三门峡","小浪底"],a:0,e:"中下分界桃花峪。"},
+{t:"single",c:"geo",q:"黄河最大支流是？",o:["汾河","渭河","洮河","湟水"],a:1,e:"中游渭河。"},
+{t:"single",c:"geo",q:"中国人口密度分界线是？",o:["秦岭淮河","黑河腾冲线","长城沿线","海岸线"],a:1,e:"胡焕庸线。"},
+{t:"single",c:"geo",q:"2025诺贝尔物理学奖领域是？",o:["量子力学","金属有机骨架","免疫耐受","创新增长"],a:0,e:"克拉克等量子贡献。"},
+{t:"single",c:"geo",q:"全球首款侵入式脑机接口适用？",o:["颈段脊髓四肢瘫","心衰","近视","抑郁"],a:0,e:"气动手套代偿抓握。"},
+{t:"single",c:"geo",q:"梦舟一号搭载的火箭是？",o:["长征六号丙","长征十号甲","朱雀三号","长征十号乙"],a:1,e:"最大动压逃逸+海上回收。"},
+{t:"single",c:"geo",q:"我国首款入轨+陆地回收火箭是？",o:["朱雀三号","长征十号甲","长征十号乙","梦舟一号"],a:0,e:"8.19民勤着陆场坪。"},
+{t:"judge",c:"geo",q:"黄河下游几乎无支流因地上河。",o:["正确","错误"],a:0,e:"泥沙淤积河床抬高。"},
+{t:"judge",c:"geo",q:"凌汛发生在由高纬流向低纬的结冰河流。",o:["正确","错误"],a:1,e:"低纬向高纬才易壅冰。"},
+{t:"judge",c:"geo",q:"二十届五中全会定于2026年10月召开。",o:["正确","错误"],a:0,e:"7.30政治局会议决定。"},
+{t:"judge",c:"geo",q:"中美新定位为建设性战略稳定关系。",o:["正确","错误"],a:0,e:"2026.5会晤确立。"},
+{t:"judge",c:"geo",q:"普通支票只能转账不能取现。",o:["正确","错误"],a:1,e:"普通支票两者皆可。"}
+];
+</script>
+<script>
+(function(){
+  let f='all', tp='all';
+  const u=new URLSearchParams(location.search);
+  if(u.get('type')){const m={law:'law',fin:'fin'}; if(m[u.get('type')]) f=m[u.get('type')];}
+  const list=document.getElementById('quizList');
+  const scoreChip=document.getElementById('scoreChip'), countChip=document.getElementById('countChip');
+  const store=JSON.parse(localStorage.getItem('affairs-answers')||'{}');
+  const wrong=JSON.parse(localStorage.getItem('affairs-wrong')||'[]');
+  function save(){localStorage.setItem('affairs-answers',JSON.stringify(store));localStorage.setItem('affairs-wrong',JSON.stringify(wrong));document.getElementById('wrongCount').textContent=wrong.length;}
+  function render(){
+    list.innerHTML='';
+    let items=BANK.map((q,i)=>({...q,idx:i})).filter(q=>(f==='all'||(f==='wrong'?wrong.includes(q.idx):q.c===f))&&(tp==='all'||q.t===tp));
+    // 题内搜索复用 app.js 的 .searchable? 这里单独过滤
+    const kw=(document.getElementById('q').value||'').trim();
+    if(kw) items=items.filter(q=>(q.q+q.e+q.o.join('')).includes(kw));
+    countChip.textContent=`共 ${items.length} 题`;
+    document.getElementById('searchCount').textContent=kw?`题内命中 ${items.length} 题`:'';
+    items.forEach((q,k)=>{
+      const d=document.createElement('div');d.className='quiz-q searchable';d.dataset.i=q.idx;
+      const typeName={single:'单选',multi:'多选',judge:'判断'}[q.t];
+      const catName={fin:'金融时政',law:'法律',new:'新增/时政',geo:'科技地理'}[q.c];
+      let opts=q.o.map((o,j)=>{
+        const input=q.t==='multi'?`<input type="checkbox" data-j="${j}">`:`<input type="radio" name="q${q.idx}" data-j="${j}">`;
+        return `<label>${input} ${String.fromCharCode(65+j)}. ${o}</label>`;
+      }).join('');
+      d.innerHTML=`<div class="muted" style="font-size:12px">${k+1}. ${typeName} · ${catName} · No.${q.idx+1}</div><b>${q.q}</b><div class="opts" style="margin-top:8px">${opts}</div>
+      <div class="toolbar"><button class="btn" onclick="this.closest('.quiz-q').classList.add('show')">看解析</button>
+      <button class="btn ghost" onclick="this.closest('.quiz-q').classList.remove('show')">隐藏</button></div>
+      <div class="ans">✅ 答案：${ansText(q)}<br>📖 解析：${q.e}</div>`;
+      list.appendChild(d);
+      // 恢复作答
+      const sv=store[q.idx];
+      if(sv!==undefined){
+        d.querySelectorAll('input').forEach(inp=>{
+          const j=+inp.dataset.j;
+          inp.checked=q.t==='multi'?sv.includes(j):sv===j;
+        });
+      }
+      d.querySelectorAll('input').forEach(inp=>inp.addEventListener('change',()=>{
+        if(q.t==='multi'){
+          const sel=[...d.querySelectorAll('input:checked')].map(x=>+x.dataset.j).sort();
+          store[q.idx]=sel;
+        }else store[q.idx]=+d.querySelector('input:checked').dataset.j;
+        save();
+      }));
+    });
+    save();
+  }
+  function ansText(q){
+    if(q.t==='multi') return q.a.map(j=>String.fromCharCode(65+j)).join('');
+    if(q.t==='judge') return q.a===0?'√ 正确':'× 错误';
+    return String.fromCharCode(65+q.a)+' '+q.o[q.a];
+  }
+  window.ansText=ansText;
+  function submit(){
+    let ok=0, done=0;
+    const items=[...list.querySelectorAll('.quiz-q')];
+    // 清除旧标记
+    items.forEach(d=>d.classList.remove('correct','wrong'));
+    items.forEach(d=>{
+      const idx=+d.dataset.i, q=BANK[idx], sv=store[idx];
+      if(sv===undefined) return;
+      done++;
+      let right=false;
+      if(q.t==='multi') right=JSON.stringify((sv||[]).slice().sort())===JSON.stringify(q.a.slice().sort());
+      else right=sv===q.a;
+      d.classList.add('show',right?'correct':'wrong');
+      if(right){ok++;const wi=wrong.indexOf(idx);if(wi>=0)wrong.splice(wi,1);}
+      else if(!wrong.includes(idx))wrong.push(idx);
+    });
+    save();
+    const card=document.getElementById('resultCard');
+    card.style.display='block';
+    card.innerHTML=`<h3>📊 本次判分：${ok} / ${items.length}（已答${done}）</h3><p class="muted">多选少选错选不得分 · 红色为答错已进错题本，绿色为答对 · 可点左侧“错题本”专项重练</p>`;
+    scoreChip.textContent=`得分：${ok}/${items.length}`;
+    card.scrollIntoView({behavior:'smooth'});
+  }
+  document.getElementById('submitBtn').onclick=submit;
+  document.getElementById('shuffleBtn').onclick=()=>{BANK.sort(()=>Math.random()-.5);render();};
+  document.getElementById('showAllBtn').onclick=()=>document.querySelectorAll('.quiz-q').forEach(d=>d.classList.add('show'));
+  document.getElementById('resetBtn').onclick=()=>{localStorage.removeItem('affairs-answers');localStorage.removeItem('affairs-wrong');for(const k in store)delete store[k];wrong.length=0;render();scoreChip.textContent='得分：未交卷';};
+  document.querySelectorAll('[data-f]').forEach(a=>a.onclick=e=>{e.preventDefault();f=a.dataset.f;render();});
+  document.querySelectorAll('[data-t]').forEach(a=>a.onclick=e=>{e.preventDefault();tp=a.dataset.t;render();});
+  document.getElementById('q').addEventListener('input',render);
+  render();
+})();
+</script>
+</body>
+</html>
