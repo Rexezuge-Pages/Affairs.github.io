@@ -3,6 +3,7 @@
   'use strict';
   var U = BSQ.util, S = BSQ.state, TX = BSQ.taxonomy;
   var R = {};
+  var homeTrack = 'all';
 
   function tagHtml(tags) {
     return (tags || []).map(function (t) {
@@ -15,9 +16,11 @@
     var d = pts.filter(function (p) { return S.points[p.id] === 1; }).length;
     return { d: d, t: pts.length, pct: U.pct(d, pts.length) };
   }
-  function head(title, sub) {
-    return '<div class="page-head"><h1>' + title + '</h1>' + (sub ? '<p>' + sub + '</p>' : '') + '</div>';
+  function head(title, sub, crumb) {
+    return '<div class="page-head">' + (crumb ? '<div class="crumbs">' + crumb + '</div>' : '') +
+      '<h1>' + title + '</h1>' + (sub ? '<p>' + sub + '</p>' : '') + '</div>';
   }
+  var CRUMB_HOME = '<a href="#/">首页</a><span>/</span>';
   BSQ.tagHtml = tagHtml; BSQ.modProgress = modProgress;
 
   /* ══════════ 首页 ══════════ */
@@ -25,35 +28,57 @@
     var st = BSQ.stats();
     var d = S.daily[BSQ.today()] || { q: 0, ok: 0, card: 0 };
     var goal = S.goal || 20;
+    var now = Date.now();
+    var dueCards = BSQ.cards.filter(function (c) {
+      var s = S.cards[c.id];
+      return !s || !s.due || s.due <= now;
+    }).length;
+    var lastMod = '', lastTs = 0;
+    Object.keys(S.qlog).forEach(function (id) {
+      var l = S.qlog[id], q = BSQ.questions.filter(function (x) { return x.id === id; })[0];
+      if (q && l.last && l.last > lastTs) { lastTs = l.last; lastMod = q.m; }
+    });
 
-    var h = '<div class="hero"><h1>2025.9 — 2026.11 银行笔试全量学习站</h1>' +
+    var h = '<div class="masthead"><div class="masthead-main">' +
+      '<div class="eyebrow">2025.9 — 2026.11 · 银行笔试备考</div>' +
+      '<h1>银行笔试全量学习站</h1>' +
       '<p>时政 · 理论思想 · 法律 · 地理黄河 · 民生社保 · 9 家银行行情 · 金融市场 —— 知识点 ' + st.totalPts +
       ' 条，题目 ' + st.totalQ + ' 道，速记卡 ' + st.totalCards + ' 张。</p>' +
-      '<div class="tags"><span class="tag">🏦 适配银行校招/社招笔试</span><span class="tag">📅 覆盖 2025.9—2026.11</span>' +
-      '<span class="tag">📱 手机 + 打印友好</span><span class="tag">💾 进度本地保存</span></div>' +
-      '<div class="cta">' +
-      '<a class="btn" href="#/learn">📚 进入知识库</a>' +
-      '<a class="btn" href="#/quiz">📝 直接刷题</a>' +
-      '<a class="btn alt" href="#/cards">🃏 速记卡</a>' +
-      '<a class="btn alt" href="#/timeline">⏳ 时间轴</a>' +
-      '</div></div>';
+      '<div class="masthead-cta"><a class="btn primary" href="#/learn">进入知识库 →</a>' +
+      '<a class="btn" href="#/quiz">直接刷题</a></div></div>' +
+      '<div class="goal-wrap"><div class="ring" style="--p:' + U.pct(d.q, goal) + '"><div>' +
+      '<div class="pv">' + d.q + '/' + goal + '</div><div class="pl">今日题量</div></div></div>' +
+      '<div class="small">今日目标完成度</div></div></div>';
 
-    /* stats + daily */
-    h += '<div class="grid g4 sec">';
-    h += '<div class="stat"><div class="lb">知识点掌握</div><div class="v">' + st.mastered + '<span class="muted" style="font-size:16px">/' + st.totalPts + '</span></div>' +
-      '<div class="bar thin" style="margin-top:6px"><i style="width:' + st.mastery + '%"></i></div></div>';
-    h += '<div class="stat"><div class="lb">今日目标</div><div class="v">' + d.q + '<span class="muted" style="font-size:16px">/' + goal + '</span></div>' +
-      '<div class="bar thin" style="margin-top:6px"><i style="width:' + U.pct(d.q, goal) + '%"></i></div></div>';
-    h += '<div class="stat"><div class="lb">答题正确率</div><div class="v">' + st.acc + '<span class="muted" style="font-size:16px">%</span></div>' +
-      '<div class="s">已作答 ' + st.attempts + ' 次 / ' + st.attemptedQ + ' 题</div></div>';
-    h += '<div class="stat"><div class="lb">错题本</div><div class="v">' + st.wrongN + '</div>' +
-      '<div class="s"><a href="#/wrong">去复习 →</a></div></div>';
-    h += '</div>';
+    /* 继续学习 */
+    h += '<div class="continue-strip">' +
+      '<a class="cs-item" href="#/cards?due=1"><span class="cs-ico" aria-hidden="true">🃏</span>' +
+      '<span class="cs-txt"><b>待复习速记卡</b><small>' + dueCards + ' 张 · 遗忘曲线安排</small></span><span class="cs-arrow">→</span></a>' +
+      '<a class="cs-item" href="#/wrong"><span class="cs-ico" aria-hidden="true">❌</span>' +
+      '<span class="cs-txt"><b>错题待巩固</b><small>' + st.wrongN + ' 道 · 答对即移出</small></span><span class="cs-arrow">→</span></a>' +
+      (lastMod ? '<a class="cs-item" href="#/learn/' + lastMod + '"><span class="cs-ico" aria-hidden="true">📖</span>' +
+        '<span class="cs-txt"><b>继续学习</b><small>' + U.esc(U.modName(lastMod)) + '</small></span><span class="cs-arrow">→</span></a>' :
+        '<a class="cs-item" href="#/timeline"><span class="cs-ico" aria-hidden="true">⏳</span>' +
+        '<span class="cs-txt"><b>从时间轴开始</b><small>' + BSQ.timeline.length + ' 个时政事件</small></span><span class="cs-arrow">→</span></a>') +
+      '</div>';
+
+    /* stats */
+    h += '<div class="grid g4 sec">' +
+      '<div class="stat"><div class="lb">知识点掌握</div><div class="v">' + st.mastered +
+      '<span class="muted" style="font-size:15px">/' + st.totalPts + '</span></div>' +
+      '<div class="bar thin" style="margin-top:6px"><i style="width:' + st.mastery + '%"></i></div></div>' +
+      '<div class="stat"><div class="lb">已练题目</div><div class="v">' + st.attemptedQ +
+      '<span class="muted" style="font-size:15px">/' + st.totalQ + '</span></div>' +
+      '<div class="bar thin" style="margin-top:6px"><i style="width:' + U.pct(st.attemptedQ, st.totalQ) + '%"></i></div></div>' +
+      '<div class="stat"><div class="lb">答题正确率</div><div class="v">' + st.acc +
+      '<span class="muted" style="font-size:15px">%</span></div><div class="s">累计 ' + st.attempts + ' 次作答</div></div>' +
+      '<div class="stat"><div class="lb">错题本</div><div class="v">' + st.wrongN + '</div>' +
+      '<div class="s"><a href="#/wrong">去复习 →</a></div></div></div>';
 
     /* bank picker */
     h += '<div class="card sec"><div class="row between"><h2 class="sec-t" style="margin:0">🎯 我的目标银行</h2>' +
-      (S.bank ? '<a class="btn sm ghost" href="#" id="clearBank">清除选择</a>' : '') + '</div>' +
-      '<p class="muted small" style="margin:6px 0 10px">选定后，首页与刷题会优先展示该银行内容（题目按银行筛选）。</p>' +
+      (S.bank ? '<button class="btn sm ghost" id="clearBank">清除选择</button>' : '') + '</div>' +
+      '<p class="muted small" style="margin:6px 0 10px">选定后，刷题可一键筛选该银行专属题目。</p>' +
       '<div class="row">' + TX.banks.map(function (id) {
         var b = BSQ.banks[id];
         return '<button class="btn sm' + (S.bank === id ? ' on' : '') + '" data-bank="' + id + '">' +
@@ -62,48 +87,30 @@
     if (S.bank) {
       var bk = BSQ.banks[S.bank];
       var qn = BSQ.questions.filter(function (q) { return q.b === S.bank; }).length;
-      h += '<div class="callout" style="margin-bottom:0">当前目标：<b>' + U.esc(bk.name) + '</b>　·　该银行专属题目 <b>' + qn + '</b> 道' +
-        '　·　<a href="#/banks/' + S.bank + '">查看银行档案 →</a>　·　' +
-        '<a href="#/quiz?bank=' + S.bank + '">只刷这家银行 →</a></div>';
+      h += '<div class="callout" style="margin-bottom:0">当前目标：<b>' + U.esc(bk.name) + '</b>　·　专属题目 <b>' + qn +
+        '</b> 道　·　<a href="#/banks/' + S.bank + '">查看档案 →</a>　·　' +
+        '<a href="#/quiz?bank=' + S.bank + '">只刷这家 →</a></div>';
     }
     h += '</div>';
 
-    /* tracks */
-    TX.tracks.forEach(function (t) {
-      var mods = TX.modules.filter(function (m) { return m.track === t.id; });
-      var pts = BSQ.points.filter(function (p) { return mods.some(function (m) { return m.id === p.m; }); });
-      var done = pts.filter(function (p) { return S.points[p.id] === 1; }).length;
-      h += '<h2 class="sec-t sec">' + t.icon + ' ' + t.name + ' <span class="muted" style="font-size:13px;font-weight:400">' +
-        t.desc + '　（' + done + '/' + pts.length + '）</span></h2>';
-      h += '<div class="grid gauto">';
-      mods.forEach(function (m) {
-        var mp = modProgress(m.id);
-        var qs = BSQ.questions.filter(function (q) { return q.m === m.id; }).length;
-        var isBank = TX.banks.indexOf(m.id) >= 0;
-        var bank = isBank ? BSQ.banks[m.id] : null;
-        h += '<a class="mod' + (mp.pct === 100 && mp.t ? ' done' : '') + '" href="#/learn/' + m.id + '"' +
-          (bank ? ' style="border-left:4px solid ' + bank.color + '"' : '') + '>' +
-          (mp.pct === 100 && mp.t ? '<span class="mbadge">✓ 已完成</span>' : '') +
-          '<div class="mh"><span class="mi">' + m.icon + '</span><span class="mt">' + U.esc(m.name) + '</span></div>' +
-          '<div class="md">' + U.esc(m.desc) + '</div>' +
-          '<div class="bar thin"><i style="width:' + mp.pct + '%"></i></div>' +
-          '<div class="mstat"><span>' + mp.d + '/' + mp.t + ' 知识点</span><span>' + qs + ' 题</span></div></a>';
-      });
-      h += '</div>';
-    });
-
-    /* shortcuts */
-    h += '<h2 class="sec-t sec">⚡ 快捷入口</h2><div class="grid gauto">' +
-      '<a class="mod" href="#/numbers"><div class="mh"><span class="mi">🔢</span><span class="mt">数字速记表</span></div><div class="md">16 组必背数字，支持遮盖自测</div></a>' +
-      '<a class="mod" href="#/compare"><div class="mh"><span class="mi">⚖️</span><span class="mt">横向对比表</span></div><div class="md">9 家银行、贺词、法律数字等 10 张对比表</div></a>' +
-      '<a class="mod" href="#/timeline"><div class="mh"><span class="mi">⏳</span><span class="mt">时政时间轴</span></div><div class="md">' + BSQ.timeline.length + ' 个事件，按月分组</div></a>' +
-      '<a class="mod" href="#/wrong"><div class="mh"><span class="mi">❌</span><span class="mt">错题本</span></div><div class="md">自动收集答错题目，重做直到掌握</div></a>' +
-      '<a class="mod" href="#/progress"><div class="mh"><span class="mi">📈</span><span class="mt">学习进度</span></div><div class="md">分模块统计，可导出/导入</div></a>' +
-      '<a class="mod" href="#/cards"><div class="mh"><span class="mi">🃏</span><span class="mt">速记卡</span></div><div class="md">' + BSQ.totalCards() + ' 张，遗忘曲线复习</div></a>' +
-      '</div>';
+    /* track tabs + module grid */
+    h += '<div class="tabs" id="trackTabs">' +
+      '<button data-track="all"' + (homeTrack === 'all' ? ' class="on"' : '') + '>全部 <span>' + TX.modules.length + '</span></button>' +
+      TX.tracks.map(function (t) {
+        var n = TX.modules.filter(function (m) { return m.track === t.id; }).length;
+        return '<button data-track="' + t.id + '"' + (homeTrack === t.id ? ' class="on"' : '') + '>' +
+          t.icon + ' ' + t.name + ' <span>' + n + '</span></button>';
+      }).join('') + '</div><div id="homeModules">' + modulesHtml() + '</div>';
 
     v.innerHTML = h;
 
+    v.querySelectorAll('#trackTabs [data-track]').forEach(function (b) {
+      b.onclick = function () {
+        homeTrack = b.dataset.track;
+        v.querySelectorAll('#trackTabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
+        v.querySelector('#homeModules').innerHTML = modulesHtml();
+      };
+    });
     v.querySelectorAll('[data-bank]').forEach(function (b) {
       b.onclick = function () {
         S.bank = S.bank === b.dataset.bank ? '' : b.dataset.bank;
@@ -112,13 +119,43 @@
       };
     });
     var cb = v.querySelector('#clearBank');
-    if (cb) cb.onclick = function (e) { e.preventDefault(); S.bank = ''; S.save(); R.home(v); };
+    if (cb) cb.onclick = function () { S.bank = ''; S.save(); R.home(v); };
+
+    function modulesHtml() {
+      var hh = '';
+      TX.tracks.filter(function (t) { return homeTrack === 'all' || homeTrack === t.id; }).forEach(function (t) {
+        var mods = TX.modules.filter(function (m) { return m.track === t.id; });
+        var pts = BSQ.points.filter(function (p) { return mods.some(function (m) { return m.id === p.m; }); });
+        var done = pts.filter(function (p) { return S.points[p.id] === 1; }).length;
+        hh += '<h2 class="sec-t">' + t.icon + ' ' + t.name +
+          ' <span class="muted" style="font-size:13px;font-weight:400">' + t.desc + '　（' + done + '/' + pts.length + '）</span></h2>';
+        hh += '<div class="grid gauto">';
+        mods.forEach(function (m) {
+          var mp = modProgress(m.id);
+          var qs = BSQ.questions.filter(function (q) { return q.m === m.id; }).length;
+          var bank = TX.banks.indexOf(m.id) >= 0 ? BSQ.banks[m.id] : null;
+          hh += '<a class="mod' + (mp.pct === 100 && mp.t ? ' done' : '') + '" href="#/learn/' + m.id + '"' +
+            (bank ? ' style="border-left:4px solid ' + bank.color + '"' : '') + '>' +
+            (mp.pct === 100 && mp.t ? '<span class="mbadge">✓ 已完成</span>' : '') +
+            '<div class="mh"><span class="mi">' + m.icon + '</span><span class="mt">' + U.esc(m.name) + '</span></div>' +
+            '<div class="md">' + U.esc(m.desc) + '</div>' +
+            '<div class="bar thin"><i style="width:' + mp.pct + '%"></i></div>' +
+            '<div class="mstat"><span>' + mp.d + '/' + mp.t + ' 知识点</span><span>' + qs + ' 题</span></div></a>';
+        });
+        hh += '</div>';
+      });
+      hh += '<div class="tools-row">' +
+        '<a href="#/numbers">🔢 数字速记表</a><a href="#/compare">⚖️ 横向对比表</a>' +
+        '<a href="#/timeline">⏳ 时政时间轴</a><a href="#/wrong">❌ 错题本</a>' +
+        '<a href="#/progress">📈 学习进度</a><a href="#/cards">🃏 速记卡</a></div>';
+      return hh;
+    }
   };
   BSQ.totalCards = function () { return (BSQ.cards || []).length; };
 
   /* ══════════ 知识库总览 ══════════ */
   R.learn = function (v) {
-    var h = head('📚 知识库', '按模块学习；勾选"已掌握"记录进度，自动保存。共 ' + BSQ.points.length + ' 条知识点、' + BSQ.questions.length + ' 道题。');
+    var h = head('📚 知识库', '按模块学习；勾选"已掌握"记录进度，自动保存。共 ' + BSQ.points.length + ' 条知识点、' + BSQ.questions.length + ' 道题。', CRUMB_HOME + '知识库');
     TX.tracks.forEach(function (t) {
       var mods = TX.modules.filter(function (m) { return m.track === t.id; });
       h += '<h2 class="sec-t sec">' + t.icon + ' ' + t.name + ' <span class="muted" style="font-size:13px;font-weight:400">' + t.desc + '</span></h2>';
@@ -148,7 +185,8 @@
     var mp = modProgress(id);
     var bank = TX.banks.indexOf(id) >= 0 ? BSQ.banks[id] : null;
 
-    var h = '<div class="page-head"><h1>' + m.icon + ' ' + U.esc(m.name) + '</h1>' +
+    var h = '<div class="page-head"><div class="crumbs"><a href="#/">首页</a><span>/</span>' +
+      '<a href="#/learn">知识库</a><span>/</span>' + U.esc(m.name) + '</div><h1>' + m.icon + ' ' + U.esc(m.name) + '</h1>' +
       '<p>' + U.esc(m.desc) + '　·　' + U.trackName(id) + ' / ' + U.modName(id) + '</p></div>';
 
     h += '<div class="card"><div class="row between">' +
@@ -161,7 +199,7 @@
       '<button class="btn sm ghost" id="resetMod">重置进度</button>' +
       '</div></div></div>';
 
-    if (bank) h += bankPanel(bank);
+    if (bank) h += bankPanel(bank, id);
 
     h += '<div class="filters sec"><label>筛选标签' +
       '<select id="fTag"><option value="">全部</option>' +
@@ -247,7 +285,8 @@
   }
 
   /* ══════════ 银行档案面板（复用） ══════════ */
-  function bankPanel(b) {
+  function bankPanel(b, id) {
+    id = id || b.id || '';
     function kvList(arr) {
       if (!arr || !arr.length) return '';
       return '<div class="kvlist">' + arr.map(function (r) {
@@ -256,7 +295,7 @@
     }
     var h = '<div class="card sec" style="border-left:4px solid ' + b.color + '">';
     h += '<div class="row between"><h2 class="sec-t" style="margin:0">' + U.esc(b.name) + ' <span class="bc tag">' + U.esc(b.cat) + '</span></h2>' +
-      '<a class="btn sm" href="#/banks/' + b.id + '">完整档案 →</a></div>';
+      '<a class="btn sm" href="#/banks/' + id + '">完整档案 →</a></div>';
     h += '<div class="callout" style="margin:11px 0"><b>考情：</b>' + b.exam + '</div>';
     h += '<h3 class="sec-t">🏛 基础档案</h3>' + kvList(b.basic);
     h += '<h3 class="sec-t">💎 企业文化</h3>' + kvList(b.culture);
@@ -269,8 +308,8 @@
         return '<div class="trap"><div class="th">⚠️ 陷阱</div>' + t + '</div>';
       }).join('');
     }
-    h += '<div class="row" style="margin-top:12px"><a class="btn sm primary" href="#/quiz?bank=' + b.id + '">📝 刷该行 ' +
-      BSQ.questions.filter(function (q) { return q.b === b.id; }).length + ' 题</a></div>';
+    h += '<div class="row" style="margin-top:12px"><a class="btn sm primary" href="#/quiz?bank=' + id + '">📝 刷该行 ' +
+      BSQ.questions.filter(function (q) { return q.b === id; }).length + ' 题</a></div>';
     h += '</div>';
     return h;
   }
@@ -278,7 +317,7 @@
 
   /* ══════════ 银行总览 ══════════ */
   R.banks = function (v, arg, q) {
-    var h = head('🏦 银行行情', '9 家银行企业文化 / 战略 / 产品 / 经营数据 ＋ 金融市场行情。银行特色题每年必考，属送分模块。');
+    var h = head('🏦 银行行情', '9 家银行企业文化 / 战略 / 产品 / 经营数据 ＋ 金融市场行情。银行特色题每年必考，属送分模块。', CRUMB_HOME + '银行');
     h += '<div class="grid gauto">';
     TX.banks.forEach(function (id) {
       var b = BSQ.banks[id];
@@ -303,8 +342,10 @@
   R.banks_ = function (v, id) {
     var b = BSQ.banks[id];
     if (!b) { v.innerHTML = '<div class="empty"><div class="ei">🤷</div><p>未找到该银行</p><a class="btn" href="#/banks">返回</a></div>'; return; }
-    v.innerHTML = '<div class="page-head"><h1>' + U.esc(b.name) + ' <span class="tag bank">' + U.esc(b.cat) + '</span></h1>' +
-      '<p>' + U.esc(b.en) + '</p></div>' + bankPanel(b) +
+    v.innerHTML = '<div class="page-head"><div class="crumbs"><a href="#/">首页</a><span>/</span>' +
+      '<a href="#/banks">银行行情</a><span>/</span>' + U.esc(b.name) + '</div><h1>' + U.esc(b.name) +
+      ' <span class="tag bank">' + U.esc(b.cat) + '</span></h1>' +
+      '<p>' + U.esc(b.en) + '</p></div>' + bankPanel(b, id) +
       '<div class="row sec"><a class="btn" href="#/banks">← 返回银行列表</a></div>';
   };
 
@@ -315,7 +356,7 @@
       m: q.m || '', b: q.bank || S.bank || '', t: q.type || '', g: q.g || '',
       d: q.diff || '', n: +(q.n || 30), order: q.order || 'seq'
     };
-    var h = head('📝 智能刷题', '筛选条件 → 选择题量 → 开始。支持单选 / 多选 / 判断 / 情景题，即时答案与解析。');
+    var h = head('📝 智能刷题', '筛选条件 → 选择题量 → 开始。支持单选 / 多选 / 判断 / 情景题，即时答案与解析。', CRUMB_HOME + '刷题');
     h += '<div class="card"><div class="filters" style="margin:0;border:0;padding:0;box-shadow:none">' +
       '<label>模块<select id="cM"><option value="">全部模块</option>' +
       TX.modules.map(function (m) { return '<option value="' + m.id + '"' + (f.m === m.id ? ' selected' : '') + '>' + m.icon + ' ' + U.esc(m.name) + '</option>'; }).join('') +
@@ -395,18 +436,17 @@
       var sel = {};
       (x.o || []).forEach(function (_, n) { sel[n] = false; });
 
-      var h = '<div class="row between sec" style="margin-bottom:10px">' +
+      var h = '<div class="quiz-head"><div style="flex:1;min-width:220px">' +
+        '<div class="row" style="gap:6px;margin-bottom:7px">' +
         '<a class="btn sm ghost" href="#/quiz">← 返回配置</a>' +
-        '<div class="row">' +
         '<span class="tag">第 ' + (i + 1) + ' / ' + list.length + ' 题</span>' +
         '<span class="tag">' + TX.qtypes.filter(function (t) { return t.id === x.t; })[0].name + '</span>' +
         '<span class="tag">' + '★'.repeat(x.d || 1) + '</span>' +
         '<span class="tag">' + U.esc(U.modName(x.m)) + '</span>' +
-        (answeredFlag ? '<span class="tag ok">已作答</span>' : '') +
-        '</div>' +
-        '<div style="min-width:130px"><div class="bar thin"><i style="width:' + U.pct(i, list.length) + '%"></i></div>' +
-        '<div class="muted small" style="text-align:right">正确 ' + right + '</div></div>' +
-        '</div>';
+        (answeredFlag ? '<span class="tag ok">已作答</span>' : '') + '</div>' +
+        '<div class="bar thin"><i style="width:' + U.pct(i, list.length) + '%"></i></div></div>' +
+        '<div class="quiz-meta"><span class="muted small" id="rightCount">正确 <b>' + right + '</b> 题</span>' +
+        '<span class="kbd">数字键选项 · Enter 下一题</span></div></div>';
 
       h += '<div class="q" id="qBox"><div class="qh"><span class="qn">' + (i + 1) + '</span>' +
         '<span class="qs">' + x.q + '</span></div>' +
@@ -419,15 +459,17 @@
         '<button class="btn sm ghost" id="starQ">' + (S.star[x.id] ? '★ 已收藏' : '☆ 收藏') + '</button>' +
         '</div></div>';
 
-      h += '<div class="row"><button class="btn" id="prevBtn"' + (i === 0 ? ' disabled' : '') + '>← 上一题</button>' +
+      h += '<div class="row quiz-nav"><button class="btn" id="prevBtn"' + (i === 0 ? ' disabled' : '') + '>← 上一题</button>' +
         '<button class="btn" id="nextBtn">下一题 →</button>' +
         '<button class="btn ghost" id="finishBtn">交卷看报告</button></div>';
 
-      h += '<div class="row sec" style="gap:5px">' + list.map(function (_, n) {
-        var l = S.qlog[list[n].id];
-        var cls = n === i ? ' on' : (l ? (l.lastOk ? ' primary' : '') : '');
-        return '<button class="btn sm' + cls + '" data-jump="' + n + '" style="min-width:32px;justify-content:center">' + (n + 1) + '</button>';
-      }).join('') + '</div>';
+      h += '<details class="answer-sheet"><summary class="sheet-toggle">🎯 答题卡' +
+        '<span class="muted small">第 ' + (i + 1) + ' / ' + list.length + ' 题 · 点击展开</span></summary>' +
+        '<div class="sheet-grid">' + list.map(function (_, n) {
+          var l = S.qlog[list[n].id];
+          var cls = n === i ? ' on' : (l ? (l.lastOk ? ' primary' : '') : '');
+          return '<button class="btn sm' + cls + '" data-jump="' + n + '">' + (n + 1) + '</button>';
+        }).join('') + '</div></details>';
 
       v.innerHTML = h;
 
@@ -490,10 +532,10 @@
       });
 
       function renderFoot(r) {
-        var bar = v.querySelectorAll('.bar i')[0];
+        var bar = v.querySelector('.quiz-head .bar i');
         if (bar) bar.style.width = U.pct(i + 1, list.length) + '%';
-        var lab = v.querySelectorAll('.muted.small')[0];
-        if (lab) lab.textContent = '正确 ' + r;
+        var lab = v.querySelector('#rightCount');
+        if (lab) lab.innerHTML = '正确 <b>' + r + '</b> 题';
       }
       function next() { if (i < list.length - 1) { i++; answered = false; render(); } else report(); }
       function record(qx, ok) {
@@ -674,6 +716,7 @@
       var s = S.cards[c.id];
       return !s || !s.due || s.due <= today;
     });
+    var gradedN = pool.filter(function (c) { return S.cards[c.id] && S.cards[c.id].n; }).length;
 
     var h = head('🃏 速记卡', '共 ' + BSQ.cards.length + ' 张。点击卡片翻面，用「认识 / 模糊 / 不认识」安排下次复习（遗忘曲线）。');
     h += '<div class="filters">' +
@@ -689,6 +732,10 @@
       '<span class="muted small">待复习 ' + dueList.length + ' 张</span></div>';
 
     if (!pool.length) { h += '<div class="empty"><div class="ei">📭</div><p>该模块暂无速记卡</p></div>'; v.innerHTML = h; return; }
+
+    h += '<div class="row between sec" style="gap:12px">' +
+      '<div class="bar" style="flex:1"><i style="width:' + U.pct(gradedN, pool.length) + '%"></i></div>' +
+      '<span class="muted small">当前范围已复习 ' + gradedN + ' / ' + pool.length + ' 张</span></div>';
 
     var showAll = !f.due;
     h += '<div class="fc-grid" id="fcGrid">' + pool.map(function (c) {
@@ -901,13 +948,13 @@
       days.map(function (x) {
         var hq = Math.round(x.d.q / mx * 88), hc = Math.round(x.d.card / mx * 88);
         return '<div style="flex:1;text-align:center"><div class="row" style="justify-content:center;align-items:flex-end;gap:3px;height:92px">' +
-          '<div title="答题 ' + x.d.q + '" style="width:14px;height:' + Math.max(x.d.q ? 3 : 0, hq) + 'px;background:var(--brand);border-radius:3px 3px 0 0"></div>' +
+          '<div title="答题 ' + x.d.q + '" style="width:14px;height:' + Math.max(x.d.q ? 3 : 0, hq) + 'px;background:var(--navy);border-radius:3px 3px 0 0"></div>' +
           '<div title="卡片 ' + x.d.card + '" style="width:14px;height:' + Math.max(x.d.card ? 3 : 0, hc) + 'px;background:var(--accent);border-radius:3px 3px 0 0"></div>' +
           '</div><div class="small muted" style="margin-top:4px">' + x.l + '</div>' +
           '<div class="small muted">' + (x.d.q || 0) + '题</div></div>';
       }).join('') + '</div>' +
       '<div class="row small muted" style="justify-content:center;margin-top:8px;gap:14px">' +
-      '<span><span style="display:inline-block;width:9px;height:9px;background:var(--brand);border-radius:2px"></span> 答题</span>' +
+      '<span><span style="display:inline-block;width:9px;height:9px;background:var(--navy);border-radius:2px"></span> 答题</span>' +
       '<span><span style="display:inline-block;width:9px;height:9px;background:var(--accent);border-radius:2px"></span> 卡片</span></div></div>';
 
     h += '<h2 class="sec-t sec">每日目标</h2><div class="card"><div class="row">' +

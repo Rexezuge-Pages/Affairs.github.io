@@ -5,50 +5,61 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>银行笔试学习站 · 2025.9—2026.11 全量考点</title>
 <meta name="description" content="银行校招/社招笔试学习站：时政+理论+法律+地理黄河+民生社保+9家银行行情+金融市场+智能刷题+速记卡">
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#132a43">
 <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
 
 <header class="topbar">
   <div class="topbar-in">
-    <a class="brand" href="#/">
-      <span class="brand-mark">银</span>
+    <a class="brand" href="#/" aria-label="银行笔试学习站首页">
+      <span class="brand-mark" aria-hidden="true">银</span>
       <span class="brand-txt">银行笔试学习站<small>2025.9 — 2026.11 · 全量考点</small></span>
     </a>
-    <nav class="nav" id="nav">
-      <a href="#/" data-r="/">🏠 首页</a>
-      <a href="#/learn" data-r="/learn">📚 知识库</a>
-      <a href="#/banks" data-r="/banks">🏦 银行</a>
-      <a href="#/quiz" data-r="/quiz">📝 刷题</a>
-      <a href="#/cards" data-r="/cards">🃏 速记卡</a>
-      <a href="#/timeline" data-r="/timeline">⏳ 时间轴</a>
-      <a href="#/numbers" data-r="/numbers">🔢 数字表</a>
-      <a href="#/compare" data-r="/compare">⚖️ 对比</a>
-      <a href="#/wrong" data-r="/wrong">❌ 错题本</a>
-      <a href="#/progress" data-r="/progress">📈 进度</a>
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a href="#/" data-r="/">首页</a>
+      <a href="#/learn" data-r="/learn">知识库</a>
+      <a href="#/quiz" data-r="/quiz">刷题</a>
+      <a href="#/cards" data-r="/cards">速记卡</a>
+      <a href="#/banks" data-r="/banks">银行</a>
+      <details class="nav-more" id="navMore">
+        <summary aria-label="更多页面">更多 <span aria-hidden="true">▾</span></summary>
+        <div class="nav-group-t">更多工具</div>
+        <div class="more-menu">
+          <a href="#/timeline" data-r="/timeline">时间轴</a>
+          <a href="#/numbers" data-r="/numbers">数字表</a>
+          <a href="#/compare" data-r="/compare">横向对比</a>
+          <a href="#/wrong" data-r="/wrong">错题本</a>
+          <a href="#/progress" data-r="/progress">学习进度</a>
+        </div>
+      </details>
     </nav>
     <div class="spacer"></div>
-    <button class="icon-btn" id="searchBtn" title="搜索（/）">🔍</button>
-    <button class="icon-btn" id="themeBtn" title="切换主题（t）">🌙</button>
-    <button class="icon-btn only-mobile" id="menuBtn" title="菜单">☰</button>
+    <button class="search-pill" id="searchBtn" title="搜索（/）" aria-label="搜索">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <span class="sp">搜索知识点、题目…</span><span class="kbd">/</span>
+    </button>
+    <button class="icon-btn" id="themeBtn" title="切换主题（t）" aria-label="切换主题"></button>
+    <button class="icon-btn only-mobile" id="menuBtn" title="菜单" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+    </button>
   </div>
   <div class="search-panel" id="searchPanel" hidden>
-    <input id="globalSearch" placeholder="搜索知识点、题目、银行、数字…（Esc 关闭）" autocomplete="off">
+    <input id="globalSearch" placeholder="搜索知识点、题目、银行、数字…（Esc 关闭）" autocomplete="off" aria-label="全站搜索">
     <div class="search-results" id="searchResults"></div>
   </div>
 </header>
 
 <main id="view" class="view"></main>
 
-<button class="btn primary only-mobile tabbar" id="toTop">↑</button>
+<button class="btn primary only-mobile tabbar" id="toTop" title="回到顶部" aria-label="回到顶部">↑</button>
 
 <footer class="foot">
   <div>银行笔试学习站 · 覆盖 2025.9 — 2026.11 · 静态 GitHub Pages</div>
   <div class="muted">进度保存在本地浏览器（localStorage）· 可在"进度"页导出/导入 · 打印 Ctrl+P</div>
 </footer>
 
-<div class="toast" id="toast" hidden></div>
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
 
 <!-- data -->
 <script src="data/taxonomy.js"></script>

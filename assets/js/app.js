@@ -4,21 +4,46 @@
   var U = BSQ.util, S = BSQ.state;
 
   /* ── theme ── */
+  var SUN = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
+  var MOON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path></svg>';
   function applyTheme(t) {
     document.documentElement.setAttribute('data-theme', t);
     var b = document.getElementById('themeBtn');
-    if (b) b.textContent = t === 'dark' ? '☀️' : '🌙';
+    if (b) b.innerHTML = t === 'dark' ? SUN : MOON;
     var m = document.querySelector('meta[name=theme-color]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0c0f18' : '#4f46e5');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0b1421' : '#132a43');
   }
   applyTheme(S.theme);
 
   /* ── nav / menu ── */
   var menuBtn = document.getElementById('menuBtn');
   var nav = document.getElementById('nav');
-  if (menuBtn) menuBtn.onclick = function () { nav.classList.toggle('open'); };
+  var navMore = document.getElementById('navMore');
+  function setMenu(open) {
+    if (!nav) return;
+    nav.classList.toggle('open', open);
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  if (menuBtn) menuBtn.onclick = function () { setMenu(!nav.classList.contains('open')); };
+  function syncNav() {
+    if (!navMore) return;
+    navMore.open = window.innerWidth <= 900;
+    if (window.innerWidth > 900) setMenu(false);
+  }
+  syncNav();
+  addEventListener('resize', syncNav, { passive: true });
   if (nav && nav.addEventListener) nav.addEventListener('click', function (e) {
-    if (e.target.tagName === 'A' && window.innerWidth <= 760) nav.classList.remove('open');
+    if (e.target.tagName === 'A') {
+      setMenu(false);
+      if (navMore && window.innerWidth > 900) navMore.open = false;
+    }
+  });
+  addEventListener('hashchange', function () { setMenu(false); });
+  document.addEventListener('click', function (e) {
+    if (navMore && navMore.open && window.innerWidth > 900 &&
+        !navMore.contains(e.target)) navMore.open = false;
+    if (nav && nav.classList.contains('open') && !nav.contains(e.target) &&
+        menuBtn && !menuBtn.contains(e.target)) setMenu(false);
   });
 
   /* ── search panel ── */
@@ -96,7 +121,12 @@
     var typing = tag === 'input' || tag === 'textarea' || tag === 'select';
 
     if (e.key === '/' && !typing) { e.preventDefault(); openSearch(); return; }
-    if (e.key === 'Escape') { closeSearch(); if (typing) e.target.blur(); return; }
+    if (e.key === 'Escape') {
+      closeSearch(); setMenu(false);
+      if (navMore && window.innerWidth > 900) navMore.open = false;
+      if (typing) e.target.blur();
+      return;
+    }
 
     if (!panel.hidden && document.activeElement === input) {
       if (e.key === 'ArrowDown') { e.preventDefault(); moveSel(1); return; }
@@ -156,7 +186,7 @@
   BSQ.start();
 
   if (window.console && console.info) {
-    console.info('%c银行笔试学习站', 'font:700 15px sans-serif;color:#4f46e5',
+    console.info('%c银行笔试学习站', 'font:700 15px sans-serif;color:#0f766e',
       '\n知识点 ' + BSQ.points.length + ' · 题目 ' + BSQ.questions.length +
       ' · 速记卡 ' + BSQ.cards.length + ' · 时间轴 ' + BSQ.timeline.length +
       ' · 数字表 ' + BSQ.numbers.length + ' · 对比表 ' + BSQ.comparisons.length);
