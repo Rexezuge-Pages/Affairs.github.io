@@ -26,10 +26,10 @@
     var d = S.daily[BSQ.today()] || { q: 0, ok: 0, card: 0 };
     var goal = S.goal || 20;
 
-    var h = '<div class="hero"><h1>2025.9 — 2026.9 银行笔试全量学习站</h1>' +
+    var h = '<div class="hero"><h1>2025.9 — 2026.11 银行笔试全量学习站</h1>' +
       '<p>时政 · 理论思想 · 法律 · 地理黄河 · 民生社保 · 9 家银行行情 · 金融市场 —— 知识点 ' + st.totalPts +
       ' 条，题目 ' + st.totalQ + ' 道，速记卡 ' + st.totalCards + ' 张。</p>' +
-      '<div class="tags"><span class="tag">🏦 适配银行校招/社招笔试</span><span class="tag">📅 覆盖 2025.9—2026.9</span>' +
+      '<div class="tags"><span class="tag">🏦 适配银行校招/社招笔试</span><span class="tag">📅 覆盖 2025.9—2026.11</span>' +
       '<span class="tag">📱 手机 + 打印友好</span><span class="tag">💾 进度本地保存</span></div>' +
       '<div class="cta">' +
       '<a class="btn" href="#/learn">📚 进入知识库</a>' +
@@ -783,7 +783,7 @@
     var months = {};
     list.forEach(function (e) { (months[e.d] = months[e.d] || []).push(e); });
 
-    var h = head('⏳ 时政时间轴', '2025.9 — 2026.9 共 ' + BSQ.timeline.length + ' 个事件，按月分组。点标签可筛选。');
+    var h = head('⏳ 时政时间轴', '2025.9 — 2026.11 共 ' + BSQ.timeline.length + ' 个事件，按月分组。点标签可筛选。');
     var tags = {};
     BSQ.timeline.forEach(function (e) { (e.g || []).forEach(function (g) { tags[g] = 1; }); });
     h += '<div class="filters"><span class="muted small">筛选：</span>' +
