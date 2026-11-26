@@ -4,9 +4,9 @@ import vm from 'vm';
 
 const root = path.resolve(process.argv[2] || '.');
 const files = [
-  'data/taxonomy.js','data/points-a.js','data/points-b.js','data/points-c.js','data/points-d.js','data/points-e.js',
-  'data/banks.js','data/questions-a.js','data/questions-b.js','data/questions-c.js',
-  'data/interview.js','data/cards.js','data/timeline.js','data/numbers.js','data/comparisons.js'
+  'data/taxonomy.js','data/points-a.js','data/points-b.js','data/points-c.js','data/points-d.js','data/points-e.js','data/points-f.js',
+  'data/banks.js','data/questions-a.js','data/questions-b.js','data/questions-c.js','data/questions-d.js',
+  'data/interview.js','data/interview-extra.js','data/cards.js','data/timeline.js','data/numbers.js','data/comparisons.js'
 ];
 
 const ctx = { console };
@@ -78,7 +78,7 @@ if (!iv || !Array.isArray(iv.questions) || !Array.isArray(iv.cats)) {
     if (!q.q || !q.a) err.push(`面试题 ${q.id} 缺题干或答题框架`);
     if (!Array.isArray(q.f) || !q.f.length) err.push(`面试题 ${q.id} 缺追问`);
   });
-  if (iv.questions.length !== 100) warn.push(`面试题数量 ${iv.questions.length}（预期 100）`);
+  if (iv.questions.length !== 146) warn.push(`面试题数量 ${iv.questions.length}（预期 146）`);
 }
 
 const cids = new Set();
