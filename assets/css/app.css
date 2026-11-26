@@ -61,6 +61,8 @@ mark{background:var(--gold-soft);color:var(--ink);padding:0 2px;border-radius:3p
 .ico-flag{width:1.25em;height:1em;vertical-align:-.12em}
 .ico.i-star{color:var(--gold)}
 .mi .ico,.cs-ico .ico,.empty .ei .ico{width:1em;height:1em;vertical-align:middle}
+.ico-bank{width:1.15em;height:1.15em;vertical-align:-.16em}
+.page-head h1 .ico-bank{width:.95em;height:.95em;vertical-align:-.1em}
 
 /* ── topbar ── */
 .topbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--surface) 93%,transparent);
@@ -318,7 +320,7 @@ td.k{font-weight:700;background:var(--surface-2);white-space:nowrap;font-variant
   display:block;box-shadow:var(--shadow-sm);transition:.16s;border-left:4px solid var(--bc,var(--accent))}
 .bk:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .bk .bh{display:flex;align-items:center;gap:9px;margin-bottom:3px}
-.bk .bn{font-family:var(--serif);font-weight:700;font-size:17px}
+.bk .bn{font-family:var(--serif);font-weight:700;font-size:17px;display:inline-flex;align-items:center;gap:6px}
 .bk .bc{font-size:11.5px;color:var(--muted);background:var(--chip);border-radius:6px;padding:1px 7px}
 .bk .bv{font-size:13.5px;color:var(--ink-2);margin:5px 0;line-height:1.55}
 .bk .bm{font-size:11.5px;color:var(--muted);font-family:var(--mono)}

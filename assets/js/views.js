@@ -294,7 +294,7 @@
       }).join('') + '</div>';
     }
     var h = '<div class="card sec" style="border-left:4px solid ' + b.color + '">';
-    h += '<div class="row between"><h2 class="sec-t" style="margin:0">' + U.esc(b.name) + ' <span class="bc tag">' + U.esc(b.cat) + '</span></h2>' +
+    h += '<div class="row between"><h2 class="sec-t" style="margin:0">' + BSQ.bankIcon(id) + U.esc(b.name) + ' <span class="bc tag">' + U.esc(b.cat) + '</span></h2>' +
       '<a class="btn sm" href="#/banks/' + id + '">完整档案 →</a></div>';
     h += '<div class="callout" style="margin:11px 0"><b>考情：</b>' + b.exam + '</div>';
     h += '<h3 class="sec-t">🏛 基础档案</h3>' + kvList(b.basic);
@@ -324,7 +324,7 @@
       var qn = BSQ.questions.filter(function (x) { return x.b === id; }).length;
       var vn = b.values || (b.culture[0] ? b.culture[0][1] : '');
       h += '<a class="bk" href="#/banks/' + id + '" style="--bc:' + b.color + '">' +
-        '<div class="bh"><span class="bn">' + U.esc(b.name) + '</span><span class="bc">' + U.esc(b.cat) + '</span></div>' +
+        '<div class="bh"><span class="bn">' + BSQ.bankIcon(id) + U.esc(b.name) + '</span><span class="bc">' + U.esc(b.cat) + '</span></div>' +
         '<div class="bv">' + U.strip(vn).slice(0, 70) + '</div>' +
         '<div class="bm">' + U.esc(b.basic[0][1]) + '</div>' +
         '<div class="row" style="margin-top:8px"><span class="tag bank">' + qn + ' 题</span>' +
@@ -343,7 +343,7 @@
     var b = BSQ.banks[id];
     if (!b) { U.html(v, '<div class="empty"><div class="ei">🤷</div><p>未找到该银行</p><a class="btn" href="#/banks">返回</a></div>'); return; }
     U.html(v, '<div class="page-head"><div class="crumbs"><a href="#/">首页</a><span>/</span>' +
-      '<a href="#/banks">银行行情</a><span>/</span>' + U.esc(b.name) + '</div><h1>' + U.esc(b.name) +
+      '<a href="#/banks">银行行情</a><span>/</span>' + U.esc(b.name) + '</div><h1>' + BSQ.bankIcon(id) + U.esc(b.name) +
       ' <span class="tag bank">' + U.esc(b.cat) + '</span></h1>' +
       '<p>' + U.esc(b.en) + '</p></div>' + bankPanel(b, id) +
       '<div class="row sec"><a class="btn" href="#/banks">← 返回银行列表</a></div>');
