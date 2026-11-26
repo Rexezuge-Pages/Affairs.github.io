@@ -98,6 +98,37 @@ Object.keys(B.banks).forEach(k => {
 });
 B.taxonomy.banks.forEach(k => { if (!B.banks[k]) err.push(`taxonomy.banks 引用了不存在的 banks.${k}`); });
 
+/* ── icon coverage: every rendered pictograph / arrow / star must have an SVG ── */
+const iconSrc = fs.readFileSync(path.join(root, 'assets/js/icons.js'), 'utf8');
+vm.runInContext(iconSrc, ctx, { filename: 'assets/js/icons.js' });
+const ICON = ctx.BSQ.icons;
+const TOKEN_RE = /(?:[\u{1F1E6}-\u{1F1FF}]{2}|[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{23FF}\u{2580}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}])(?:\u{FE0F})?/gu;
+const sprite = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const spriteIds = new Set([...sprite.matchAll(/<symbol id="(i-[^"]+)"/g)].map(m => m[1]));
+
+function walk(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap(e => {
+    if (e.name === '.git') return [];
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) return walk(p);
+    if (p.endsWith(path.join(root, 'tools/validate.mjs'))) return [];
+    return /\.(js|html|css)$/.test(e.name) ? [p] : [];
+  });
+}
+for (const f of walk(root)) {
+  const lines = fs.readFileSync(f, 'utf8').split('\n');
+  lines.forEach((line, n) => {
+    for (const m of line.matchAll(TOKEN_RE)) {
+      if (!(m[0] in ICON.map)) err.push(`图标未映射: ${m[0]} (${path.relative(root, f)}:${n + 1})`);
+    }
+  });
+}
+Object.entries(ICON.map).forEach(([token, def]) => {
+  if (!spriteIds.has('i-' + def[0])) err.push(`图标 sprite 缺失: i-${def[0]} (${token})`);
+});
+const leftovers = ICON.iconify(Object.keys(ICON.map).join(' ')).match(TOKEN_RE);
+if (leftovers) err.push(`iconify 仍有残留 token: ${[...new Set(leftovers)].join(' ')}`);
+
 console.log('── 内容规模 ──');
 console.log('知识点    ', B.points.length);
 console.log('题目      ', B.questions.length, JSON.stringify(B.questions.reduce((a,q)=>{a[q.t]=(a[q.t]||0)+1;return a;},{})));

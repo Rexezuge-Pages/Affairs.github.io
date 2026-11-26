@@ -11,6 +11,8 @@ window.BSQ = window.BSQ || {};
       });
     },
     strip: function (s) { return String(s || '').replace(/<[^>]*>/g, ''); },
+    html: function (el, s) { el.innerHTML = BSQ.icons.iconify(s); },
+    insert: function (el, where, s) { el.insertAdjacentHTML(where, BSQ.icons.iconify(s)); },
     hl: function (s, kw) {
       var t = U.strip(s);
       if (!kw) return t;
@@ -48,7 +50,7 @@ window.BSQ = window.BSQ || {};
     toast: function (msg) {
       var t = document.getElementById('toast');
       if (!t) return;
-      t.textContent = msg; t.hidden = false;
+      U.html(t, U.esc(msg)); t.hidden = false;
       clearTimeout(U._tt);
       U._tt = setTimeout(function () { t.hidden = true; }, 1900);
     },
@@ -216,7 +218,7 @@ window.BSQ = window.BSQ || {};
       v.innerHTML = '';
       try { fn(v, arg, q); }
       catch (err) {
-        v.innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>页面出错：' + U.esc(err.message) + '</p></div>';
+        U.html(v, '<div class="empty"><div class="ei">⚠️</div><p>页面出错：' + U.esc(err.message) + '</p></div>');
         if (window.console) console.error(err);
       }
       window.scrollTo(0, 0);

@@ -58,7 +58,7 @@
   function closeSearch() { panel.hidden = true; }
 
   function showIdle() {
-    results.innerHTML = '<div class="sr-group">试试搜索</div>' +
+    U.html(results, '<div class="sr-group">试试搜索</div>' +
       HOT.map(function (w) {
         return '<a class="sr-item" data-kw="' + U.esc(w) + '"><div class="sr-t">🔎 ' + U.esc(w) + '</div></a>';
       }).join('') +
@@ -66,7 +66,7 @@
       [['#/quiz?m=finance', '📝 金融时政专项'], ['#/quiz?m=law', '⚖️ 法律专项'],
        ['#/quiz?t=judge', '✅ 判断题专项'], ['#/banks', '🏦 9 家银行'],
        ['#/numbers', '🔢 数字速记表'], ['#/compare', '⚖️ 横向对比表']]
-        .map(function (p) { return '<a class="sr-item" href="' + p[0] + '" data-close="1"><div class="sr-t">' + p[1] + '</div></a>'; }).join('');
+        .map(function (p) { return '<a class="sr-item" href="' + p[0] + '" data-close="1"><div class="sr-t">' + p[1] + '</div></a>'; }).join(''));
     wire();
   }
 
@@ -75,7 +75,7 @@
     if (!kw) { showIdle(); return; }
     var res = BSQ.search(kw, 50);
     if (!res.length) {
-      results.innerHTML = '<div class="sr-empty">没有找到「' + U.esc(kw) + '」<br><span class="small">换个关键词试试，比如：五篇大文章 / 票据 / 黄河 / 招行</span></div>';
+      U.html(results, '<div class="sr-empty">没有找到「' + U.esc(kw) + '」<br><span class="small">换个关键词试试，比如：五篇大文章 / 票据 / 黄河 / 招行</span></div>');
       return;
     }
     var groups = {};
@@ -90,7 +90,7 @@
           '<div class="sr-d">' + U.hl(r.d, kw) + '</div></a>';
       });
     });
-    results.innerHTML = h;
+    U.html(results, h);
     wire();
   }
 

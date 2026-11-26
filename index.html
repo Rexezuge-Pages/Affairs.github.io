@@ -10,6 +10,65 @@
 </head>
 <body>
 
+<!-- SVG sprite: all UI icons (tokens mapped in assets/js/icons.js) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false">
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M20 12H4m6-6-6 6 6 6"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 20V4m-6 6 6-6 6 6"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 17V5m-5 5 5-5 5 5M4 21h16"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 6.5M20 4v7h-7"/></symbol>
+  <symbol id="i-check-square" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-11"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2.8 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.7l-5.8 3 1.1-6.5L2.6 9.6l6.5-.9L12 2.8z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-star-o" viewBox="0 0 24 24"><path d="m12 2.8 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.7l-5.8 3 1.1-6.5L2.6 9.6l6.5-.9L12 2.8z"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6m0-6-6 6"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="M10.3 3.9 2.6 17.5a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4m0 4h.01"/></symbol>
+  <symbol id="i-help-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.6 2.6 0 1 1 3.7 2.3c-.8.4-1.3 1.2-1.3 2.1v.3m0 3.3h.01"/></symbol>
+  <symbol id="i-scales" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M4 7h16M4 7l-2 6h4L4 7zm16 0-2 6h4l-2-6z"/></symbol>
+  <symbol id="i-cards" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6m-6 4h6"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 3 4 3-4 3M3 11V9a3 3 0 0 1 3-3h15M7 21l-4-3 4-3m14-2v2a3 3 0 0 1-3 3H4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 7 4 4v2H6v-2l4-4-1-7zm3 13v5"/></symbol>
+  <symbol id="i-trending-up" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-8m0 0h-5m5 0v5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10m5 10V4m5 16v-7m5 7V7"/></symbol>
+  <symbol id="i-file-pen" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M9 8h6m-6 4h3"/><path d="m19 3 2 2-8 8-3 1 1-3 8-8z"/></symbol>
+  <symbol id="i-books" viewBox="0 0 24 24"><path d="M12 5.5C10.5 4.3 8.6 4 6 4H4v15h2c2.6 0 4.5.3 6 1.5 1.5-1.2 3.4-1.5 6-1.5h2V4h-2c-2.6 0-4.5.3-6 1.5zM12 5.5v15"/></symbol>
+  <symbol id="i-book-open" viewBox="0 0 24 24"><path d="M12 6c-2-1.5-4.5-2-8-2v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2V4c-3.5 0-6 .5-8 2zm0 0v14"/></symbol>
+  <symbol id="i-newspaper" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h6v6H7zM15 8h2m-2 3h2M7 17h10"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="m3 9 9-6 9 6M4 9v10m5-10v10m6-10v10m5-10v10M3 21h18"/></symbol>
+  <symbol id="i-flag-cn" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="1.5" fill="#de2910" stroke="none"/><path d="m6.4 7.3 1 1 1.6.2-1.2 1.1.3 1.6-1.5-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z" fill="#ffde00" stroke="none"/><circle cx="10.8" cy="8" r=".55" fill="#ffde00" stroke="none"/><circle cx="12" cy="9.9" r=".55" fill="#ffde00" stroke="none"/><circle cx="12" cy="12.2" r=".55" fill="#ffde00" stroke="none"/><circle cx="10.8" cy="14" r=".55" fill="#ffde00" stroke="none"/></symbol>
+  <symbol id="i-handshake" viewBox="0 0 24 24"><path d="m2 12 4-4 3 2 3-2 3 2 4-2 3 4-4 4-3-2-3 2-3-2-3 2-4-4z"/></symbol>
+  <symbol id="i-scroll" viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm0 16a2 2 0 0 0 2-2V5M9 8h7m-7 4h7m-7 4h5"/></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 3c3 1 5 4 5 8l-2 4H9l-2-4c0-4 2-7 5-8z"/><circle cx="12" cy="9" r="2"/><path d="m9 15-2 4 4-2m4-2 2 4-4-2M12 3V2"/></symbol>
+  <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="12" cy="7" rx="8" ry="3.5"/><path d="M4 7v6c0 2 3.6 3.5 8 3.5s8-1.5 8-3.5V7M4 13v5c0 2 3.6 3.5 8 3.5s8-1.5 8-3.5v-5"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6zm6-3v15m6-12v15"/></symbol>
+  <symbol id="i-wheat" viewBox="0 0 24 24"><path d="M12 21V4m0 3c-2-2-4-2-6-1m6 4c-2-2-4-2-6-1m6 4c-2-2-4-2-6-1m6-6c2-2 4-2 6-1m-6 4c2-2 4-2 6-1m-6 4c2-2 4-2 6-1"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-3 0h6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M6 3h12M6 21h12M7 3c0 4 5 6 5 9s-5 5-5 9m10-18c0 4-5 6-5 9s5 5 5 9"/></symbol>
+  <symbol id="i-landmark" viewBox="0 0 24 24"><path d="m3 10 9-6 9 6M4 10h16M5 10v9m5-9v9m4-9v9m5-9v9M3 21h18"/></symbol>
+  <symbol id="i-gem" viewBox="0 0 24 24"><path d="m12 3 7 6-7 12-7-12 7-6zm-7 6h14M9 9l3 12 3-12"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"/></symbol>
+  <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M3 9v6m3-8v10m3-7v4m6-4v4m3-7v10m3-8v6M9 12h6"/></symbol>
+  <symbol id="i-thumbs-up" viewBox="0 0 24 24"><path d="M7 10v11H4V10h3zm0 0 4-7a2 2 0 0 1 3 2l-1 4h5a2 2 0 0 1 2 2.5l-2 8a2 2 0 0 1-2 1.5H7"/></symbol>
+  <symbol id="i-party" viewBox="0 0 24 24"><path d="M4 20 9 7l8 8-13 5z"/><path d="M13 3v3m4-1-2 3m4 2-3 1M5 3l2 3"/></symbol>
+  <symbol id="i-shrug" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M8 9h8l2 5-3 1-1 9h-4l-1-9-3-1 2-5zM4 10l2 3m14-3-2 3"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13h5l2 3h4l2-3h5M3 13l3-8h12l3 8v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.2A11 11 0 0 1 12 6c6.4 0 10 6 10 6a17 17 0 0 1-3.2 3.6M6.5 8C3.9 9.7 2 12 2 12s3.6 6 10 6c1.3 0 2.5-.2 3.5-.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+  <symbol id="i-hash" viewBox="0 0 24 24"><path d="M5 9h14M4 15h14M10 3 8 21M16 3l-2 18"/></symbol>
+  <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-diamond" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" transform="rotate(45 12 12)" fill="currentColor" stroke="none"/></symbol>
+</svg>
+
 <header class="topbar">
   <div class="topbar-in">
     <a class="brand" href="#/" aria-label="银行笔试学习站首页">
@@ -23,7 +82,7 @@
       <a href="#/cards" data-r="/cards">速记卡</a>
       <a href="#/banks" data-r="/banks">银行</a>
       <details class="nav-more" id="navMore">
-        <summary aria-label="更多页面">更多 <span aria-hidden="true">▾</span></summary>
+        <summary aria-label="更多页面">更多 <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-chevron-down"></use></svg></summary>
         <div class="nav-group-t">更多工具</div>
         <div class="more-menu">
           <a href="#/timeline" data-r="/timeline">时间轴</a>
@@ -52,7 +111,7 @@
 
 <main id="view" class="view"></main>
 
-<button class="btn primary only-mobile tabbar" id="toTop" title="回到顶部" aria-label="回到顶部">↑</button>
+<button class="btn primary only-mobile tabbar" id="toTop" title="回到顶部" aria-label="回到顶部"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-arrow-up"></use></svg></button>
 
 <footer class="foot">
   <div>银行笔试学习站 · 覆盖 2025.9 — 2026.11 · 静态 GitHub Pages</div>
@@ -77,6 +136,7 @@
 <script src="data/numbers.js"></script>
 <script src="data/comparisons.js"></script>
 <!-- app -->
+<script src="assets/js/icons.js"></script>
 <script src="assets/js/core.js"></script>
 <script src="assets/js/views.js"></script>
 <script src="assets/js/app.js"></script>

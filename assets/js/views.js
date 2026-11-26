@@ -102,13 +102,13 @@
           t.icon + ' ' + t.name + ' <span>' + n + '</span></button>';
       }).join('') + '</div><div id="homeModules">' + modulesHtml() + '</div>';
 
-    v.innerHTML = h;
+    U.html(v, h);
 
     v.querySelectorAll('#trackTabs [data-track]').forEach(function (b) {
       b.onclick = function () {
         homeTrack = b.dataset.track;
         v.querySelectorAll('#trackTabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
-        v.querySelector('#homeModules').innerHTML = modulesHtml();
+        U.html(v.querySelector('#homeModules'), modulesHtml());
       };
     });
     v.querySelectorAll('[data-bank]').forEach(function (b) {
@@ -173,13 +173,13 @@
       });
       h += '</div>';
     });
-    v.innerHTML = h;
+    U.html(v, h);
   };
 
   /* ══════════ 模块详情 ══════════ */
   R.learn_ = function (v, id, q) {
     var m = U.module(id);
-    if (!m) { v.innerHTML = '<div class="empty"><div class="ei">🤷</div><p>模块不存在</p><a class="btn" href="#/learn">返回知识库</a></div>'; return; }
+    if (!m) { U.html(v, '<div class="empty"><div class="ei">🤷</div><p>模块不存在</p><a class="btn" href="#/learn">返回知识库</a></div>'); return; }
     var pts = BSQ.points.filter(function (p) { return p.m === id; });
     var qs = BSQ.questions.filter(function (q2) { return q2.m === id; });
     var mp = modProgress(id);
@@ -213,14 +213,14 @@
     h += '<div id="ptList">' + pts.map(pointHtml).join('') + '</div>';
     if (!pts.length) h = h.replace('<div id="ptList"></div>', '<div class="empty"><div class="ei">📭</div><p>本模块暂无知识点</p></div>');
 
-    v.innerHTML = h;
+    U.html(v, h);
     wirePoints(v, pts, id);
   };
 
   function pointHtml(p) {
     var st = S.points[p.id] || 0;
     return '<details class="pt" id="pt-' + U.esc(p.id) + '"' + (st === 1 ? ' data-st="1"' : '') + '>' +
-      '<summary><span style="flex:1">' + U.esc(p.t) + '</span>' +
+      '<summary><span class="pchev">' + BSQ.ico('chevron-right') + '</span><span style="flex:1">' + U.esc(p.t) + '</span>' +
       '<span class="pmeta">' + tagHtml(p.tag) + '</span></summary>' +
       '<div class="pbody"><div>' + p.b + '</div>' +
       '<div class="pacts">' +
@@ -335,18 +335,18 @@
     h += '<div class="mod sec" style="margin-top:14px;display:block"><div class="mh"><span class="mi">📈</span>' +
       '<span class="mt">金融市场行情（通用）</span></div><div class="md">' + U.esc(mk.desc) + '</div>' +
       '<a class="btn sm primary" href="#/learn/market">进入学习 →</a></div>';
-    v.innerHTML = h;
+    U.html(v, h);
   };
 
   /* ══════════ 银行详情 ══════════ */
   R.banks_ = function (v, id) {
     var b = BSQ.banks[id];
-    if (!b) { v.innerHTML = '<div class="empty"><div class="ei">🤷</div><p>未找到该银行</p><a class="btn" href="#/banks">返回</a></div>'; return; }
-    v.innerHTML = '<div class="page-head"><div class="crumbs"><a href="#/">首页</a><span>/</span>' +
+    if (!b) { U.html(v, '<div class="empty"><div class="ei">🤷</div><p>未找到该银行</p><a class="btn" href="#/banks">返回</a></div>'); return; }
+    U.html(v, '<div class="page-head"><div class="crumbs"><a href="#/">首页</a><span>/</span>' +
       '<a href="#/banks">银行行情</a><span>/</span>' + U.esc(b.name) + '</div><h1>' + U.esc(b.name) +
       ' <span class="tag bank">' + U.esc(b.cat) + '</span></h1>' +
       '<p>' + U.esc(b.en) + '</p></div>' + bankPanel(b, id) +
-      '<div class="row sec"><a class="btn" href="#/banks">← 返回银行列表</a></div>';
+      '<div class="row sec"><a class="btn" href="#/banks">← 返回银行列表</a></div>');
   };
 
   /* ══════════ 刷题配置 ══════════ */
@@ -359,7 +359,7 @@
     var h = head('📝 智能刷题', '筛选条件 → 选择题量 → 开始。支持单选 / 多选 / 判断 / 情景题，即时答案与解析。', CRUMB_HOME + '刷题');
     h += '<div class="card"><div class="filters" style="margin:0;border:0;padding:0;box-shadow:none">' +
       '<label>模块<select id="cM"><option value="">全部模块</option>' +
-      TX.modules.map(function (m) { return '<option value="' + m.id + '"' + (f.m === m.id ? ' selected' : '') + '>' + m.icon + ' ' + U.esc(m.name) + '</option>'; }).join('') +
+      TX.modules.map(function (m) { return '<option value="' + m.id + '"' + (f.m === m.id ? ' selected' : '') + '>' + U.esc(m.name) + '</option>'; }).join('') +
       '</select></label>' +
       '<label>银行<select id="cB"><option value="">全部银行</option>' +
       TX.banks.map(function (id) { return '<option value="' + id + '"' + (f.b === id ? ' selected' : '') + '>' + U.esc(BSQ.banks[id].name) + '</option>'; }).join('') +
@@ -369,7 +369,7 @@
         return '<option value="' + t + '"' + (f.t === t ? ' selected' : '') + '>' + nm + '</option>';
       }).join('') + '</select></label>' +
       '<label>难度<select id="cD">' + ['', '1', '2', '3'].map(function (t) {
-        return '<option value="' + t + '"' + (f.d === t ? ' selected' : '') + '>' + ({ '': '全部', '1': '★ 基础', '2': '★★ 进阶', '3': '★★★ 高难' })[t] + '</option>';
+        return '<option value="' + t + '"' + (f.d === t ? ' selected' : '') + '>' + ({ '': '全部', '1': '1 基础', '2': '2 进阶', '3': '3 高难' })[t] + '</option>';
       }).join('') + '</select></label>' +
       '<label>题量<input id="cN" type="number" min="1" max="200" value="' + f.n + '" style="width:74px"></label>' +
       '<label>顺序<select id="cO">' + [['seq', '按顺序'], ['rand', '随机']].map(function (x) {
@@ -395,7 +395,7 @@
       h += '<a class="btn sm" href="#/quiz?m=' + m.id + '&n=' + Math.min(n, 30) + '">' + m.icon + ' ' + U.esc(m.name) + ' <span class="muted">' + n + '</span></a>';
     });
     h += '</div>';
-    v.innerHTML = h;
+    U.html(v, h);
 
     v.querySelector('#startBtn').onclick = function () {
       var p = new URLSearchParams();
@@ -419,7 +419,7 @@
       return true;
     });
     if (!pool.length) {
-      v.innerHTML = '<div class="empty"><div class="ei">🔍</div><p>没有符合条件的题目</p><a class="btn" href="#/quiz">调整筛选</a></div>';
+      U.html(v, '<div class="empty"><div class="ei">🔍</div><p>没有符合条件的题目</p><a class="btn" href="#/quiz">调整筛选</a></div>');
       return;
     }
     if (q.order === 'rand') pool = U.shuffle(pool);
@@ -471,7 +471,7 @@
           return '<button class="btn sm' + cls + '" data-jump="' + n + '">' + (n + 1) + '</button>';
         }).join('') + '</div></details>';
 
-      v.innerHTML = h;
+      U.html(v, h);
 
       var box = v.querySelector('#qBox');
       function lock() {
@@ -483,8 +483,7 @@
           if (ansArr.indexOf('ABCDEF'[n]) >= 0) el.classList.add('ok');
           else if (sel[n]) el.classList.add('no');
         });
-        box.insertAdjacentHTML('beforeend',
-          '<div class="expl"><div class="eh">✅ 正确答案：' + U.esc(x.a) + '　' + (isMulti ? '（多选，少选/错选不得分）' : '') + '</div>' +
+        U.insert(box, 'beforeend', '<div class="expl"><div class="eh">✅ 正确答案：' + U.esc(x.a) + '　' + (isMulti ? '（多选，少选/错选不得分）' : '') + '</div>' +
           (x.e || '') + '</div>');
         var mine = picked();
         var ok = mine === String(x.a);
@@ -521,7 +520,7 @@
       };
       v.querySelector('#starQ').onclick = function () {
         S.star[x.id] = S.star[x.id] ? 0 : 1; S.save();
-        this.textContent = S.star[x.id] ? '★ 已收藏' : '☆ 收藏';
+        U.html(this, S.star[x.id] ? '★ 已收藏' : '☆ 收藏');
         U.toast(S.star[x.id] ? '已收藏' : '已取消收藏');
       };
       v.querySelector('#prevBtn').onclick = function () { if (i > 0) { i--; answered = false; render(); } };
@@ -535,7 +534,7 @@
         var bar = v.querySelector('.quiz-head .bar i');
         if (bar) bar.style.width = U.pct(i + 1, list.length) + '%';
         var lab = v.querySelector('#rightCount');
-        if (lab) lab.innerHTML = '正确 <b>' + r + '</b> 题';
+        if (lab) U.html(lab, '正确 <b>' + r + '</b> 题');
       }
       function next() { if (i < list.length - 1) { i++; answered = false; render(); } else report(); }
       function record(qx, ok) {
@@ -569,13 +568,12 @@
           hh += '<h2 class="sec-t sec">本次错题</h2>';
           wrongList.forEach(function (x) { hh += qHtml(x, null, true); });
         }
-        v.innerHTML = hh;
+        U.html(v, hh);
         v.querySelector('#againBtn').onclick = function () { U.go('#/quiz/run?' + U.qs(location.hash)); };
         v.querySelectorAll('[data-rev]').forEach(function (b) {
           b.onclick = function () {
             var x = list.filter(function (y) { return y.id === b.dataset.rev; })[0];
-            b.closest('.q').insertAdjacentHTML('beforeend',
-              '<div class="expl"><div class="eh">正确答案：' + U.esc(x.a) + '</div>' + (x.e || '') + '</div>');
+            U.insert(b.closest('.q'), 'beforeend', '<div class="expl"><div class="eh">正确答案：' + U.esc(x.a) + '</div>' + (x.e || '') + '</div>');
           };
         });
       }
@@ -603,8 +601,8 @@
   R.wrong = function (v) {
     var ids = Object.keys(S.wrong).filter(function (id) { return S.qlog[id] && S.qlog[id].lastOk === false; });
     if (!ids.length) {
-      v.innerHTML = head('❌ 错题本', '答错的题目会自动收集到这里。') +
-        '<div class="empty"><div class="ei">🎉</div><p>暂时没有错题，继续保持！</p><a class="btn primary" href="#/quiz">去刷题</a></div>';
+      U.html(v, head('❌ 错题本', '答错的题目会自动收集到这里。') +
+        '<div class="empty"><div class="ei">🎉</div><p>暂时没有错题，继续保持！</p><a class="btn primary" href="#/quiz">去刷题</a></div>');
       return;
     }
     var list = U.shuffle(ids.map(function (id) { return BSQ.questions.filter(function (x) { return x.id === id; })[0]; }).filter(Boolean));
@@ -614,14 +612,14 @@
     h += '<div class="row"><button class="btn primary" id="redoBtn">🔁 开始重做（' + list.length + '）</button>' +
       '<button class="btn ghost" id="clearBtn">🗑 清空错题本</button></div>';
     h += '<div id="wBody" class="sec"></div>';
-    v.innerHTML = h;
+    U.html(v, h);
 
     function renderList() {
-      v.querySelector('#wBody').innerHTML = list.map(function (x) {
+      U.html(v.querySelector('#wBody'), list.map(function (x) {
         var l = S.qlog[x.id];
         return qHtml(x, null, false).replace('<button class="btn sm ghost" data-rev=',
           '<span class="tag">错 ' + (l.wrong || 1) + ' 次</span><button class="btn sm ghost" data-rev=');
-      }).join('');
+      }).join(''));
       wire();
     }
     function wire() {
@@ -630,8 +628,7 @@
           var x = list.filter(function (y) { return y.id === b.dataset.rev; })[0];
           var box = b.closest('.q');
           if (box.querySelector('.expl')) return;
-          box.insertAdjacentHTML('beforeend',
-            '<div class="expl"><div class="eh">正确答案：' + U.esc(x.a) + '</div>' + (x.e || '') + '</div>');
+          U.insert(box, 'beforeend', '<div class="expl"><div class="eh">正确答案：' + U.esc(x.a) + '</div>' + (x.e || '') + '</div>');
           box.querySelectorAll('.opt').forEach(function (el, n) {
             if (String(x.a).split('').indexOf('ABCDEF'[n]) >= 0) el.classList.add('ok');
           });
@@ -645,15 +642,14 @@
     function step() {
       var x = list[i];
       var isMulti = x.t === 'multi', sel = {};
-      v.querySelector('#wBody').innerHTML =
-        '<div class="row" style="margin-bottom:10px"><span class="tag">第 ' + (i + 1) + ' / ' + list.length + ' 题</span>' +
+      U.html(v.querySelector('#wBody'), '<div class="row" style="margin-bottom:10px"><span class="tag">第 ' + (i + 1) + ' / ' + list.length + ' 题</span>' +
         '<a class="btn sm ghost" href="#/wrong">← 退出重做</a></div>' +
         '<div class="q" id="qBox"><div class="qh"><span class="qn">' + (i + 1) + '</span><span class="qs">' + x.q + '</span></div>' +
         '<div class="opts">' + x.o.map(function (o, n) {
           return '<label class="opt" data-n="' + n + '"><span class="ol">' + 'ABCDEF'[n] + '</span><span>' + o + '</span></label>';
         }).join('') + '</div>' +
         '<div class="qfoot"><button class="btn sm primary" id="ck">' + (isMulti ? '提交' : '确认') + '</button>' +
-        '<button class="btn sm ghost" id="sk">跳过</button></div></div>';
+        '<button class="btn sm ghost" id="sk">跳过</button></div></div>');
       function pick() {
         var out = []; x.o.forEach(function (_, n) { if (sel[n]) out.push('ABCDEF'[n]); });
         return out.sort().join('');
@@ -667,7 +663,7 @@
           if (String(x.a).split('').indexOf('ABCDEF'[el.dataset.n]) >= 0) el.classList.add('ok');
           else if (sel[el.dataset.n]) el.classList.add('no');
         });
-        box.insertAdjacentHTML('beforeend', '<div class="expl"><div class="eh">' + (ok ? '✅ 正确！' : '❌ 正确答案：' + U.esc(x.a)) + '</div>' + (x.e || '') + '</div>');
+        U.insert(box, 'beforeend', '<div class="expl"><div class="eh">' + (ok ? '✅ 正确！' : '❌ 正确答案：' + U.esc(x.a)) + '</div>' + (x.e || '') + '</div>');
         var l = S.qlog[x.id] || { n: 0, ok: 0, wrong: 0 };
         l.n++; l.last = Date.now();
         if (ok) { l.ok++; l.lastOk = true; delete S.wrong[x.id]; }
@@ -676,7 +672,7 @@
         v.querySelector('#ck').style.display = 'none';
         var nb = document.createElement('button');
         nb.className = 'btn sm primary';
-        nb.textContent = i < list.length - 1 ? '下一题 →' : '完成';
+        U.html(nb, i < list.length - 1 ? '下一题 →' : '完成');
         nb.onclick = function () { i++; if (i < list.length) step(); else done(); };
         v.querySelector('#qBox .qfoot').appendChild(nb);
       }
@@ -692,10 +688,10 @@
     }
     function done() {
       var left = list.filter(function (x) { return S.wrong[x.id]; }).length;
-      v.querySelector('#wBody').innerHTML = '<div class="empty"><div class="ei">' + (left ? '💪' : '🎉') + '</div>' +
+      U.html(v.querySelector('#wBody'), '<div class="empty"><div class="ei">' + (left ? '💪' : '🎉') + '</div>' +
         '<p>' + (left ? '还有 <b>' + left + '</b> 道题需要巩固' : '错题本已清空，全部掌握！') + '</p>' +
         '<div class="row" style="justify-content:center"><a class="btn primary" href="#/quiz">继续刷题</a>' +
-        '<button class="btn" onclick="location.reload()">查看结果</button></div></div>';
+        '<button class="btn" onclick="location.reload()">查看结果</button></div></div>');
       R.wrongCount = left;
     }
 
@@ -723,7 +719,7 @@
       '<label>模块<select id="cM"><option value="">全部</option>' +
       TX.modules.map(function (m) {
         var n = BSQ.cards.filter(function (c) { return c.m === m.id; }).length;
-        return n ? '<option value="' + m.id + '"' + (f.m === m.id ? ' selected' : '') + '>' + m.icon + ' ' + U.esc(m.name) + '（' + n + '）</option>' : '';
+        return n ? '<option value="' + m.id + '"' + (f.m === m.id ? ' selected' : '') + '>' + U.esc(m.name) + '（' + n + '）</option>' : '';
       }).join('') + '</select></label>' +
       '<label>范围<select id="cD"><option value="">全部卡片</option>' +
       '<option value="1"' + (f.due ? ' selected' : '') + '>仅待复习（' + dueList.length + '）</option></select></label>' +
@@ -731,7 +727,7 @@
       '<button class="btn sm" id="allC">全部过一遍</button>' +
       '<span class="muted small">待复习 ' + dueList.length + ' 张</span></div>';
 
-    if (!pool.length) { h += '<div class="empty"><div class="ei">📭</div><p>该模块暂无速记卡</p></div>'; v.innerHTML = h; return; }
+    if (!pool.length) { h += '<div class="empty"><div class="ei">📭</div><p>该模块暂无速记卡</p></div>'; U.html(v, h); return; }
 
     h += '<div class="row between sec" style="gap:12px">' +
       '<div class="bar" style="flex:1"><i style="width:' + U.pct(gradedN, pool.length) + '%"></i></div>' +
@@ -753,7 +749,7 @@
         '</div></div></div></div>';
     }).join('') + '</div>';
     if (!showAll) h += '<style>.hidden-card{display:none}</style>';
-    v.innerHTML = h;
+    U.html(v, h);
 
     function go(cards) {
       if (!cards.length) { U.toast('没有待复习的卡片 🎉'); return; }
@@ -761,8 +757,7 @@
       var i = 0;
       function step() {
         var c = cards[i];
-        v.querySelector('#fcGrid').innerHTML =
-          '<div class="row" style="margin-bottom:12px;grid-column:1/-1"><span class="tag">第 ' + (i + 1) + ' / ' + cards.length + '</span>' +
+        U.html(v.querySelector('#fcGrid'), '<div class="row" style="margin-bottom:12px;grid-column:1/-1"><span class="tag">第 ' + (i + 1) + ' / ' + cards.length + '</span>' +
           '<button class="btn sm ghost" id="exitC">← 退出</button></div>' +
           '<div class="fc" id="oneCard" style="height:250px;grid-column:1/-1;max-width:520px;margin:0 auto;width:100%">' +
           '<div class="fc-in">' +
@@ -773,7 +768,7 @@
           '<button class="mini bad" data-g="no">不认识</button>' +
           '<button class="mini mid" data-g="mid">模糊</button>' +
           '<button class="mini good" data-g="yes">认识</button>' +
-          '</div></div></div></div>';
+          '</div></div></div></div>');
         var card = v.querySelector('#oneCard');
         card.onclick = function (e) {
           if (e.target.closest('button')) return;
@@ -786,8 +781,8 @@
         window._fcFlip = function () { card.classList.toggle('flip'); };
       }
       function fin() {
-        v.querySelector('#fcGrid').innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="ei">🎉</div><p>本轮复习完成！</p>' +
-          '<div class="row" style="justify-content:center"><button class="btn primary" onclick="location.reload()">查看卡片</button></div></div>';
+        U.html(v.querySelector('#fcGrid'), '<div class="empty" style="grid-column:1/-1"><div class="ei">🎉</div><p>本轮复习完成！</p>' +
+          '<div class="row" style="justify-content:center"><button class="btn primary" onclick="location.reload()">查看卡片</button></div></div>');
       }
       step();
     }
@@ -851,7 +846,7 @@
       });
       h += '</div>';
     });
-    v.innerHTML = h;
+    U.html(v, h);
     v.querySelectorAll('[data-t]').forEach(function (b) {
       b.onclick = function () { U.go('#/timeline?t=' + encodeURIComponent(b.dataset.t)); };
     });
@@ -874,7 +869,7 @@
           return '<tr><td class="k">' + r[0] + '</td><td>' + r[1] + '</td></tr>';
         }).join('') + '</tbody></table></div></div>';
     });
-    v.innerHTML = h;
+    U.html(v, h);
     v.querySelector('#tgHide').onclick = function () {
       U.go('#/numbers?hide=' + (hide ? '0' : '1'));
     };
@@ -898,7 +893,7 @@
           }).join('') + '</tr>';
         }).join('') + '</tbody></table></div></div>';
     });
-    v.innerHTML = h;
+    U.html(v, h);
     v.querySelector('#tgHide').onclick = function () { U.go('#/compare?hide=' + (hide ? '0' : '1')); };
   };
 
@@ -961,7 +956,7 @@
       '<label class="muted small">每天做题目标<input id="goalIn" type="number" min="5" max="200" value="' + (S.goal || 20) + '" style="width:80px;margin-left:6px"></label>' +
       '<button class="btn sm" id="saveGoal">保存</button></div></div>';
 
-    v.innerHTML = h;
+    U.html(v, h);
 
     v.querySelector('#expBtn').onclick = function () {
       var blob = new Blob([JSON.stringify({ v: 1, ts: Date.now(), points: S.points, cards: S.cards, qlog: S.qlog, wrong: S.wrong, star: S.star, daily: S.daily, goal: S.goal, bank: S.bank }, null, 2)], { type: 'application/json' });
