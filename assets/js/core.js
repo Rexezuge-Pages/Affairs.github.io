@@ -157,6 +157,10 @@ window.BSQ = window.BSQ || {};
                  extra: (q.g || []).join(' ') + ' ' + (q.o || []).join(' '),
                  ref: '#/quiz?q=' + (q.id || (q.id = 'q' + i)) });
     });
+    (BSQ.interview ? BSQ.interview.questions : []).forEach(function (q, i) {
+      idx.push({ k: 'iv', t: U.strip(q.q), d: U.strip(q.a).slice(0, 240), m: q.c,
+                 extra: (q.f || []).join(' '), ref: '#/interview?q=' + q.id });
+    });
     Object.keys(BSQ.banks).forEach(function (k) {
       var b = BSQ.banks[k];
       var flat = [b.name, b.cat, b.exam].concat(

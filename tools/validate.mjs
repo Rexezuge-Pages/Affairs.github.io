@@ -6,7 +6,7 @@ const root = path.resolve(process.argv[2] || '.');
 const files = [
   'data/taxonomy.js','data/points-a.js','data/points-b.js','data/points-c.js','data/points-d.js','data/points-e.js',
   'data/banks.js','data/questions-a.js','data/questions-b.js','data/questions-c.js',
-  'data/cards.js','data/timeline.js','data/numbers.js','data/comparisons.js'
+  'data/interview.js','data/cards.js','data/timeline.js','data/numbers.js','data/comparisons.js'
 ];
 
 const ctx = { console };
@@ -63,6 +63,23 @@ B.questions.forEach((q, i) => {
   if (stems.has(key)) warn.push(`相似题干: ${q.id} ≈ ${stems.get(key)}`);
   stems.set(key, q.id);
 });
+
+const iv = B.interview;
+if (!iv || !Array.isArray(iv.questions) || !Array.isArray(iv.cats)) {
+  err.push('面试题库结构缺失');
+} else {
+  const ivCats = new Set(iv.cats.map(c => c.id));
+  const iids = new Set();
+  iv.questions.forEach((q, i) => {
+    q.id = q.id || ('I' + (i + 1));
+    if (iids.has(q.id)) err.push(`重复 id: ${q.id}`);
+    iids.add(q.id);
+    if (!ivCats.has(q.c)) err.push(`面试题 ${q.id} 分类无效: ${q.c}`);
+    if (!q.q || !q.a) err.push(`面试题 ${q.id} 缺题干或答题框架`);
+    if (!Array.isArray(q.f) || !q.f.length) err.push(`面试题 ${q.id} 缺追问`);
+  });
+  if (iv.questions.length !== 100) warn.push(`面试题数量 ${iv.questions.length}（预期 100）`);
+}
 
 const cids = new Set();
 B.cards.forEach((c, i) => {
@@ -132,6 +149,7 @@ if (leftovers) err.push(`iconify 仍有残留 token: ${[...new Set(leftovers)].j
 console.log('── 内容规模 ──');
 console.log('知识点    ', B.points.length);
 console.log('题目      ', B.questions.length, JSON.stringify(B.questions.reduce((a,q)=>{a[q.t]=(a[q.t]||0)+1;return a;},{})));
+console.log('面试题    ', B.interview.questions.length, `(${(B.interview.questions||[]).filter(q=>q.hot).length} 道高频)`);
 console.log('速记卡    ', B.cards.length);
 console.log('时间轴    ', B.timeline.length);
 console.log('数字表    ', B.numbers.length, `(${(B.numbers||[]).reduce((a,g)=>a+g.rows.length,0)} 行)`);

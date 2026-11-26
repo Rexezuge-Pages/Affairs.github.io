@@ -45,7 +45,7 @@
       '<p>时政 · 理论思想 · 法律 · 地理黄河 · 民生社保 · 9 家银行行情 · 金融市场 —— 知识点 ' + st.totalPts +
       ' 条，题目 ' + st.totalQ + ' 道，速记卡 ' + st.totalCards + ' 张。</p>' +
       '<div class="masthead-cta"><a class="btn primary" href="#/learn">进入知识库 →</a>' +
-      '<a class="btn" href="#/quiz">直接刷题</a></div></div>' +
+      '<a class="btn" href="#/quiz">直接刷题</a><a class="btn" href="#/interview">面试准备</a></div></div>' +
       '<div class="goal-wrap"><div class="ring" style="--p:' + U.pct(d.q, goal) + '"><div>' +
       '<div class="pv">' + d.q + '/' + goal + '</div><div class="pl">今日题量</div></div></div>' +
       '<div class="small">今日目标完成度</div></div></div>';
@@ -995,6 +995,139 @@
     };
   };
 
+  /* ══════════ 面试准备 · 工行上海分行金融通才 ══════════ */
+  var ivCat = '', ivKw = '', ivHot = 0, ivTodo = 0, ivExpanded = false;
+
+  function ivDoneMap() { return BSQ.store.get('ivdone', {}); }
+  function ivCatName(id) {
+    var cs = (BSQ.interview && BSQ.interview.cats) || [];
+    for (var i = 0; i < cs.length; i++) if (cs[i].id === id) return cs[i].name;
+    return id;
+  }
+  function ivFiltered() {
+    var done = ivDoneMap();
+    return BSQ.interview.questions.filter(function (q) {
+      if (ivCat && q.c !== ivCat) return false;
+      if (ivHot && !q.hot) return false;
+      if (ivTodo && done[q.id]) return false;
+      if (ivKw) {
+        var hay = (q.q + ' ' + (q.f || []).join(' ') + ' ' + U.strip(q.a) + ' ' + ivCatName(q.c)).toLowerCase();
+        if (hay.indexOf(ivKw.toLowerCase()) < 0) return false;
+      }
+      return true;
+    });
+  }
+  function ivListHtml(list) {
+    if (!list.length) return '<div class="empty"><div class="ei">?</div><p>没有符合条件的题目，换个筛选条件试试。</p></div>';
+    var done = ivDoneMap();
+    return list.map(function (q, i) {
+      return '<details class="pt ivq' + (done[q.id] ? ' done' : '') + '" id="iv-' + q.id + '" data-id="' + q.id + '"' +
+        (ivExpanded ? ' open' : '') + '>' +
+        '<summary><span class="qn">' + (i + 1) + '</span>' +
+        '<span class="ivqt">' + U.esc(q.q) + '</span>' +
+        '<span class="pmeta">' + (q.hot ? '<span class="tag hot">高频</span>' : '') +
+        '<span class="tag">' + U.esc(ivCatName(q.c)) + '</span>' +
+        (done[q.id] ? '<span class="tag ok">已准备</span>' : '') + '</span></summary>' +
+        '<div class="pbody"><div class="ivs">追问（考官可能随机挑 1—2 个）</div>' +
+        '<ul class="ivf">' + (q.f || []).map(function (f) { return '<li>' + U.esc(f) + '</li>'; }).join('') + '</ul>' +
+        '<div class="expl"><div class="eh">参考答题框架</div>' + q.a + '</div>' +
+        '<div class="pacts"><button class="btn sm" data-ivdone="' + q.id + '">' +
+        (done[q.id] ? '取消已准备' : '标记为已准备') + '</button>' +
+        '<button class="btn sm ghost" data-ivcopy="' + q.id + '">复制题目</button></div></div></details>';
+    }).join('');
+  }
+  function ivWire(v) {
+    v.querySelectorAll('[data-ivdone]').forEach(function (b) {
+      b.onclick = function () {
+        var m = ivDoneMap(), id = b.dataset.ivdone;
+        if (m[id]) delete m[id]; else m[id] = 1;
+        BSQ.store.set('ivdone', m);
+        ivRefresh(v);
+        U.toast(m[id] ? '已标记：' + id : '已取消标记：' + id);
+      };
+    });
+    v.querySelectorAll('[data-ivcopy]').forEach(function (b) {
+      b.onclick = function () {
+        var q = BSQ.interview.questions.filter(function (x) { return x.id === b.dataset.ivcopy; })[0];
+        if (!q) return;
+        var txt = q.q + '\n追问：' + q.f.join(' / ') + '\n答题框架：' + U.strip(q.a);
+        try {
+          if (navigator.clipboard) navigator.clipboard.writeText(txt);
+          else U.toast('当前浏览器不支持一键复制');
+          U.toast('已复制 ' + q.id);
+        } catch (e) { U.toast('复制失败，请手动选择文字'); }
+      };
+    });
+  }
+  function ivRefresh(v) {
+    var list = ivFiltered();
+    U.html(v.querySelector('#ivList'), ivListHtml(list));
+    U.html(v.querySelector('#ivCount'), String(list.length));
+    var done = ivDoneMap(), all = BSQ.interview.questions;
+    var dn = all.filter(function (q) { return done[q.id]; }).length;
+    U.html(v.querySelector('#ivProg'), '<div class="iv-prog"><div class="bar thin"><i style="width:' +
+      U.pct(dn, all.length) + '%"></i></div><span class="small muted">已准备 ' + dn + ' / ' + all.length + ' 道</span></div>');
+    ivWire(v);
+  }
+
+  R.interview = function (v, arg, qp) {
+    var D = BSQ.interview, all = D.questions, m = ivDoneMap();
+    if (qp.c !== undefined) ivCat = qp.c;
+    if (qp.kw !== undefined) ivKw = qp.kw;
+    ivHot = qp.hot === '1' ? 1 : 0;
+    ivTodo = qp.todo === '1' ? 1 : 0;
+    var dn = all.filter(function (x) { return m[x.id]; }).length;
+
+    var h = head('🎤 面试准备 · 工商银行上海分行金融通才', D.meta.sub, CRUMB_HOME + '面试准备');
+    h += '<div class="card sec"><div class="callout ok" style="margin:0"><b>目标岗位：</b>' + U.esc(D.meta.target) +
+      '<br><b>面试形式：</b>' + U.esc(D.meta.form) + '<br><b>使用建议：</b>' + D.meta.tip + '</div>' +
+      '<div id="ivProg"></div></div>';
+
+    h += '<div class="tabs" id="ivTabs"><button data-c=""' + (ivCat ? '' : ' class="on"') +
+      '>全部 <span>' + all.length + '</span></button>' +
+      D.cats.map(function (c) {
+        return '<button data-c="' + c.id + '"' + (ivCat === c.id ? ' class="on"' : '') + '>' +
+          U.esc(c.name) + ' <span>' + all.filter(function (x) { return x.c === c.id; }).length + '</span></button>';
+      }).join('') + '</div>';
+
+    h += '<div class="filters">' +
+      '<input type="text" id="ivSearch" placeholder="搜索题干 / 追问 / 答题框架…" value="' + U.esc(ivKw) + '" aria-label="搜索面试题">' +
+      '<button class="btn sm' + (ivHot ? ' on' : '') + '" id="ivHot">' + (ivHot ? '☑ 只看高频' : '只看高频') + '</button>' +
+      '<button class="btn sm' + (ivTodo ? ' on' : '') + '" id="ivTodo">' + (ivTodo ? '☑ 只看未准备' : '只看未准备') + '</button>' +
+      '<button class="btn sm primary" id="ivRandom">随机抽题</button>' +
+      '<button class="btn sm ghost" id="ivExpand">展开全部</button>' +
+      '<button class="btn sm ghost" id="ivCollapse">收起全部</button>' +
+      '<span class="muted small">符合条件 <b id="ivCount">' + all.length + '</b> 道</span></div>';
+    h += '<div id="ivList"></div>';
+    U.html(v, h);
+    ivRefresh(v);
+
+    v.querySelectorAll('#ivTabs [data-c]').forEach(function (b) {
+      b.onclick = function () { ivCat = b.dataset.c; U.go('#/interview?c=' + encodeURIComponent(ivCat)); };
+    });
+    var srch = v.querySelector('#ivSearch');
+    srch.oninput = function () { ivKw = srch.value.trim(); ivRefresh(v); };
+    v.querySelector('#ivHot').onclick = function () { ivHot = ivHot ? 0 : 1; U.go('#/interview?c=' + encodeURIComponent(ivCat) + (ivHot ? '&hot=1' : '')); };
+    v.querySelector('#ivTodo').onclick = function () { ivTodo = ivTodo ? 0 : 1; U.go('#/interview?c=' + encodeURIComponent(ivCat) + (ivTodo ? '&todo=1' : '')); };
+    v.querySelector('#ivExpand').onclick = function () { ivExpanded = true; v.querySelectorAll('#ivList details').forEach(function (d) { d.open = true; }); };
+    v.querySelector('#ivCollapse').onclick = function () { ivExpanded = false; v.querySelectorAll('#ivList details').forEach(function (d) { d.open = false; }); };
+    v.querySelector('#ivRandom').onclick = function () {
+      var list = ivFiltered();
+      if (!list.length) { U.toast('当前筛选下没有题目'); return; }
+      var pick = list[Math.floor(Math.random() * list.length)];
+      ivExpanded = false;
+      U.go('#/interview?c=' + encodeURIComponent(ivCat) + '&q=' + pick.id);
+      U.toast('随机抽到 ' + pick.id);
+    };
+
+    if (qp.q) {
+      setTimeout(function () {
+        var el = v.querySelector('#iv-' + qp.q);
+        if (el) { el.open = true; el.scrollIntoView({ block: 'center' }); }
+      }, 0);
+    }
+  };
+
   /* ── register routes ── */
   BSQ.route('home', R.home);
   BSQ.route('learn', R.learn);
@@ -1003,6 +1136,7 @@
   BSQ.route('banks/', R.banks_);
   BSQ.route('quiz', R.quiz);
   BSQ.route('quiz/run', R.quizrun);
+  BSQ.route('interview', R.interview);
   BSQ.route('cards', R.cards);
   BSQ.route('timeline', R.timeline);
   BSQ.route('numbers', R.numbers);

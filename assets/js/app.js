@@ -51,8 +51,8 @@
   var input = document.getElementById('globalSearch');
   var results = document.getElementById('searchResults');
   var selIdx = -1;
-  var KLABEL = { point: '知识点', q: '题目', bank: '银行', time: '时间轴', num: '数字表' };
-  var HOT = ['五篇大文章', '金融强国', '十五五', '试用期', '诉讼时效', '因您而变', '核心价值观', '凌汛', '诺奖', '内卷式竞争'];
+  var KLABEL = { point: '知识点', q: '题目', bank: '银行', time: '时间轴', num: '数字表', iv: '面试题' };
+  var HOT = ['五篇大文章', '金融强国', '十五五', '试用期', '诉讼时效', '因您而变', '核心价值观', '凌汛', '诺奖', '内卷式竞争', '半结构化', '金融通才'];
 
   function openSearch() { panel.hidden = false; input.focus(); input.select(); if (!input.value.trim()) showIdle(); }
   function closeSearch() { panel.hidden = true; }
@@ -65,7 +65,7 @@
       '<div class="sr-group">快速跳转</div>' +
       [['#/quiz?m=finance', '📝 金融时政专项'], ['#/quiz?m=law', '⚖️ 法律专项'],
        ['#/quiz?t=judge', '✅ 判断题专项'], ['#/banks', '🏦 9 家银行'],
-       ['#/numbers', '🔢 数字速记表'], ['#/compare', '⚖️ 横向对比表']]
+       ['#/interview', '🎤 面试准备'], ['#/numbers', '🔢 数字速记表'], ['#/compare', '⚖️ 横向对比表']]
         .map(function (p) { return '<a class="sr-item" href="' + p[0] + '" data-close="1"><div class="sr-t">' + p[1] + '</div></a>'; }).join(''));
     wire();
   }
@@ -188,6 +188,7 @@
   if (window.console && console.info) {
     console.info('%c银行笔试学习站', 'font:700 15px sans-serif;color:#0f766e',
       '\n知识点 ' + BSQ.points.length + ' · 题目 ' + BSQ.questions.length +
+      ' · 面试题 ' + BSQ.interview.questions.length +
       ' · 速记卡 ' + BSQ.cards.length + ' · 时间轴 ' + BSQ.timeline.length +
       ' · 数字表 ' + BSQ.numbers.length + ' · 对比表 ' + BSQ.comparisons.length);
   }
